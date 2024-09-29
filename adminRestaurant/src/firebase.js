@@ -3,7 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyB7oEMxFoHLj6M_tw8ywwBpan8e7zN2g6U",
+  apiKey: "AIzaSyB7oEMxFoHLj6M_tw8ywwBpan8e7zN2g6U",
   authDomain: "adminrestaurantapp-7ae66.firebaseapp.com",
   projectId: "adminrestaurantapp-7ae66",
   storageBucket: "adminrestaurantapp-7ae66.appspot.com",
