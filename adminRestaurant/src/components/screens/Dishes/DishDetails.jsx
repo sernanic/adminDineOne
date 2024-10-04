@@ -30,20 +30,24 @@ function DishDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [modifierGroups, setModifierGroups] = useState([]);
 
   useEffect(() => {
     const fetchDishDetails = async () => {
       try {
-        const [dishResponse, imagesResponse] = await Promise.all([
+        const [dishResponse, imagesResponse, modifierGroupsResponse] = await Promise.all([
           axios.get(`http://127.0.0.1:4000/item/${merchantId}/${itemId}`),
-          axios.get(`http://127.0.0.1:4000/item/${itemId}/images`)
+          axios.get(`http://127.0.0.1:4000/item/${itemId}/images`),
+          axios.get(`http://127.0.0.1:4000/item/${merchantId}/${itemId}/modifierGroups`)
         ]);
 
-        console.log("dishResponse", dishResponse)
-        console.log("imagesResponse", imagesResponse.data.itemImages)
+        console.log("dishResponse", dishResponse);
+        console.log("imagesResponse", imagesResponse.data.itemImages);
+        console.log("modifierGroupsResponse", modifierGroupsResponse.data.modifierGroups);
 
         setDishData(dishResponse.data.item);
         setDishImages(imagesResponse.data.itemImages || []); // Ensure it's always an array
+        setModifierGroups(modifierGroupsResponse.data.modifierGroups || []);
         setIsLoading(false);
         
       } catch (error) {

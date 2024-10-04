@@ -182,6 +182,8 @@ export default function Orders() {
   })
 
   return (
+    <div className="flex justify-center items-center" style={{width: '100%', height: '100%'}}>
+    <div className="bg-white rounded-lg p-4" style={{width: '95%', height: '90%'}}>
     <div className="container mx-auto px-4">
       <div className="flex items-center py-4">
         <Input
@@ -293,6 +295,8 @@ export default function Orders() {
           </Button>
         </div>
       </div>
+    </div>
+    </div>
     </div>
   )
 }

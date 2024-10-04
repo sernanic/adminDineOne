@@ -18,6 +18,8 @@ export default function Sections() {
   if (error) return <div>An error occurred: {error.message}</div>
 
   return (
+    <div className="flex justify-center items-center" style={{width: '100%', height: '100%'}}>
+    <div className="bg-white rounded-lg p-4" style={{width: '95%', height: '90%'}}>
     <DataTable
       data={sections}
       columns={columns}
@@ -25,5 +27,7 @@ export default function Sections() {
       onSync={handleSync}
       isSyncing={isSyncing}
     />
+    </div>
+    </div>
   )
 }

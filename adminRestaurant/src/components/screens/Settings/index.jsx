@@ -5,6 +5,7 @@ import IntegrationsSettings from './IntegrationsSettings';
 import SupportSettings from './SupportSettings';
 import OrganizationsSettings from './OrganizationsSettings';
 import AdvancedSettings from './AdvancedSettings';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const Settings = () => {
     const [selectedTab, setSelectedTab] = useState('general');
@@ -67,7 +68,5 @@ const Settings = () => {
         </div>
     );
 };
-
-
 
 export default Settings;

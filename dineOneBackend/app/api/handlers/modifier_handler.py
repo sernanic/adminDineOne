@@ -2,6 +2,9 @@ from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
 from app.utils.auth_middleware import firebase_auth_required
+import json
+import logging
+
 modifierBp = Blueprint('modifierBp', __name__)
 
 @modifierBp.route('/sync/modifierGroups', methods=['POST'])
@@ -70,3 +73,46 @@ def getModifiers(merchantId):
         return jsonify({"modifiers": modifiersData}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@modifierBp.route('/item/<merchantId>/<itemId>/modifierGroups', methods=['GET'])
+def getItemModifierGroupsWithModifiers(merchantId, itemId):
+    try:
+        modifier_groups_raw = CloverService.fetchItemModifierGroups(merchantId, itemId)
+        modifier_groups = modifier_groups_raw['modifierGroups']['elements']
+
+        result = []
+        for group in modifier_groups:
+            group_data = {
+                'id': group['id'],
+                'name': group['name'],
+                'showByDefault': group['showByDefault'],
+                'sortOrder': group['sortOrder'],
+                'deleted': group['deleted'],
+                'items': group['items'],
+                'modifiers': []
+            }
+            print("group_data", group)
+            
+            # Fetch modifiers for each group
+            modifiers_raw = SupabaseService.getModifiersByIds(group['modifierIds'])
+            print("modifiers_raw:", modifiers_raw)
+
+            group_data['modifiers'] = [{
+                'id': modifier.modifierId,
+                'name': modifier.name,
+                'price': float(modifier.price) if modifier.price is not None else None,
+                'available': modifier.available,
+                'modifiedTime': modifier.modifiedTime.isoformat() if modifier.modifiedTime else None,
+                'modifierGroupId': modifier.modifierGroupId,
+                'deleted': modifier.deleted
+            } for modifier in modifiers_raw]
+            
+            result.append(group_data)
+
+        return jsonify({"modifierGroups": result}), 200
+
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+# ... existing code ...

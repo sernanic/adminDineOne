@@ -166,6 +166,7 @@ class SupabaseService:
         :return: A list of Modifier objects
         """
         return Modifier.query.filter_by(merchantId=merchantId).all()
+    
 
     @staticmethod
     def insertOrUpdateModifier(modifierData, merchantId):
@@ -423,3 +424,19 @@ class SupabaseService:
             print(f"An error occurred while deleting item image: {str(e)}")
             db.session.rollback()
             raise
+
+    @staticmethod
+    def getModifiersByIds(id_list_string):
+        """
+        Retrieve all modifiers whose IDs are in the given comma-separated string of IDs.
+
+        :param id_list_string: A string of comma-separated modifier IDs (e.g., "7JJ329CPT56WR,8KK430DQU67XS")
+        :return: A list of Modifier objects
+        """
+        # Split the string into a list of IDs and strip any whitespace
+        id_list = [id.strip() for id in id_list_string.split(',') if id.strip()]
+
+        # Query the database for modifiers with IDs in the list
+        modifiers = Modifier.query.filter(Modifier.modifierId.in_(id_list)).all()
+
+        return modifiers

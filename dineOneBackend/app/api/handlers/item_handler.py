@@ -103,8 +103,7 @@ def addItemImages():
 def getItemImages(item_id):
     try:
         itemImages = SupabaseService.getItemImagesByItemId(item_id)
-        print(itemImages)
-        print("itemImages", itemImages)
+
         if itemImages:
             imagesData = [
                 {
@@ -113,7 +112,6 @@ def getItemImages(item_id):
                     'imageUrl': image.imageURL
                 } for image in itemImages
             ]
-            print("imagesData", imagesData)
             return jsonify({"itemImages": imagesData}), 200
         else:
             return jsonify({"itemImages": []}), 200

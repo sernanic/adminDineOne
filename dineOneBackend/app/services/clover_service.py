@@ -91,13 +91,14 @@ class CloverService:
     @staticmethod
     def fetchItemModifierGroups(merchant_id, item_id):
         with current_app.app_context():
-            url = f"https://api.clover.com/v3/merchants/{merchant_id}/items/{item_id}/modifier_groups"
+            print("merchant_id", merchant_id)
+            url = f"https://api.clover.com/v3/merchants/{merchant_id}/items/{item_id}?expand=modifierGroups"
             headers = {
                 "Authorization": f"Bearer {current_app.config['CLOVER_API_KEY']}"
             }
             response = requests.get(url, headers=headers)
-            print("clover response", response.json()['elements'])
             if response.status_code == 200:
-                return response.json()['elements']  # Assuming the modifier groups are in the 'elements' key
+                return response.json() # Assuming the modifier groups are in the 'elements' key
             else:
                 response.raise_for_status()
+

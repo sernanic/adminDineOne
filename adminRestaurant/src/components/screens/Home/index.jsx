@@ -7,8 +7,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Home() {
-  const { currentUser } = useAuth();
-  console.log(currentUser);
+  const auth = useAuth();
+  const currentUser = auth?.currentUser;
+
+  if (!auth) {
+    console.error("Auth context is undefined");
+    return <div>Loading...</div>;
+  }
+
+  if (!currentUser) {
+    console.error("Current user is undefined");
+    return <div>Please log in to view this page.</div>;
+  }
+
   return (
     <div className="container mx-auto px-4">
       <h1 className="text-2xl mb-8">Welcome, {currentUser.email}</h1>
