@@ -4,6 +4,7 @@ import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 import ImageUploader from '../../shared/imageUploader';
 import { Pencil, Trash2 } from 'lucide-react'; // Import the icons
+import { Card, CardHeader, CardBody, CardFooter, Image, Button } from "@nextui-org/react";
 
 import {
   Table,
@@ -131,67 +132,72 @@ export default function SectionDetails() {
   };
 
   return (
-    <div>
-      <div className="container mx-auto mt-8">
-        <h1 className="text-2xl font-bold mb-4">Section Details</h1>
-        {sectionData && (
-          <div className="flex flex-row gap-8"> {/* Add this wrapper div with flex */}
-            <div className="flex-1 info-container">
-              <h2 className="text-xl font-semibold mb-2">{sectionData.category.name}</h2>
-              <p>Category ID: {categoryId}</p>
-              <p>Sort Order: {sectionData.category.sortOrder}</p>
-              <p>Deleted: {sectionData.category.deleted ? "Yes" : "No"}</p>
+    <div className="container mx-auto mt-8">
+      {sectionData && (
+        <Card isFooterBlurred className="w-full max-w-[50%] mx-auto h-[300px] col-span-12 sm:col-span-7 mb-8">
+          <CardHeader className="absolute z-10 top-1 flex-col items-start"></CardHeader>
+          {categoryImage ? (
+            <Image
+              removeWrapper
+              alt="Category Image"
+              className="z-0 w-full h-full object-cover"
+              src={categoryImage.imageURL}
+            />
+          ) : (
+            <div className="z-0 w-full h-full flex items-center justify-center bg-gray-200">
+              <ImageUploader onImageUploaded={addCategoryImage} bucketName="categoryImages" />
             </div>
-            <div className="flex-shrink-0 image-container">
-              {categoryImage ? (
-                <div className="mb-4 relative">
-                  <img src={categoryImage.imageURL} alt="Category" className="max-w-xs" />
-                  <div className="absolute top-0 right-0 p-2 flex space-x-2">
-                    <button
-                      onClick={handleEditImage}
-                      className="p-1 bg-black text-white rounded hover:bg-gray-800 transition-colors"
-                    >
-                      <Pencil size={20} />
-                    </button>
-                    <button
-                      onClick={handleDeleteImage}
-                      className="p-1 bg-black text-white rounded hover:bg-gray-800 transition-colors"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <ImageUploader onImageUploaded={addCategoryImage} bucketName="categoryImages" />
-              )}
+          )}
+          <CardFooter className="absolute bg-black/40 bottom-0 z-10 border-t-1 border-default-600 dark:border-default-100">
+            <div className="flex flex-col flex-grow">
+              <h4 className="text-white font-semibold text-lg mb-1">{sectionData.category.name}</h4>
+              <div className="flex flex-col text-white">
+                <p className="text-tiny">Category ID: {categoryId}</p>
+                <p className="text-tiny">Sort Order: {sectionData.category.sortOrder}</p>
+                <p className="text-tiny">Deleted: {sectionData.category.deleted ? "Yes" : "No"}</p>
+              </div>
             </div>
-          </div>
-        )}
-        <h3 className="text-lg font-semibold mt-4 mb-2">Items in this section:</h3>
-        <Table>
-          <TableHeader>
-            <TableRow>
+            {categoryImage && (
+              <div className="flex space-x-2">
+                <Button size="sm" onClick={handleEditImage} startContent={<Pencil size={16} />}>
+                  Edit
+                </Button>
+                <Button size="sm" color="danger" onClick={handleDeleteImage} startContent={<Trash2 size={16} />}>
+                  Delete
+                </Button>
+              </div>
+            )}
+          </CardFooter>
+        </Card>
+      )}
+      <div className="flex justify-center items-center" style={{width: '100%', height: '100%'}}>
+      <div className="bg-white rounded-lg p-4" style={{width: '95%', height: '90%'}}>
+      <h3 className="text-lg font-semibold mt-4 mb-2">Items in this section:</h3>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {columns.map((column) => (
+              <TableHead key={column.accessorKey}>{column.header}</TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sectionData.items.map((item) => (
+            <TableRow key={item.id}>
               {columns.map((column) => (
-                <TableHead key={column.accessorKey}>{column.header}</TableHead>
+                <TableCell key={`${item.id}-${column.accessorKey}`}>
+                  {column.accessorKey === 'price'
+                    ? `$${(item[column.accessorKey] / 100).toFixed(2)}`
+                    : column.accessorKey === 'defaultTaxRates'
+                    ? item[column.accessorKey] ? 'Yes' : 'No'
+                    : item[column.accessorKey]}
+                </TableCell>
               ))}
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sectionData.items.map((item) => (
-              <TableRow key={item.id}>
-                {columns.map((column) => (
-                  <TableCell key={`${item.id}-${column.accessorKey}`}>
-                    {column.accessorKey === 'price'
-                      ? `$${(item[column.accessorKey] / 100).toFixed(2)}`
-                      : column.accessorKey === 'defaultTaxRates'
-                      ? item[column.accessorKey] ? 'Yes' : 'No'
-                      : item[column.accessorKey]}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+          ))}
+        </TableBody>
+      </Table>
+      </div>
       </div>
     </div>
   );

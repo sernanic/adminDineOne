@@ -3,7 +3,9 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 import ImageUploader from '../../shared/imageUploader';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
+import {Accordion, AccordionItem} from "@nextui-org/react";
+
 // ... existing imports ...
 
 // Add these new imports
@@ -21,7 +23,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardBody, CardFooter,Button } from "@nextui-org/react";
+
+// Add these new imports for the Shadcn UI table components
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 function DishDetails() {
   const { merchantId, itemId } = useParams();
@@ -87,6 +100,9 @@ function DishDetails() {
       console.error('Error adding dish image:', error);
     }
   };
+  const defaultContent =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+
 
   const handleDeleteImage = async (imageId) => {
     try {
@@ -117,61 +133,106 @@ function DishDetails() {
     <div className="container mx-auto mt-8">
       <h1 className="text-2xl font-bold mb-4">Dish Details</h1>
       {dishData && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start justify-between">
-            <div className="w-1/6"></div> {/* Spacer */}
-            <div className="w-2/3 max-w-2xl">
+        <div className="relative w-full max-w-[50%] mx-auto">
+          <Card isFooterBlurred className="w-full h-[400px] col-span-12 sm:col-span-7 mb-8">
+            <CardBody className="p-0 overflow-hidden">
               {dishImages.length > 0 ? (
-                <Carousel>
+                <Carousel className="w-full h-full">
                   <CarouselContent>
                     {dishImages.map((image, index) => (
-                      <CarouselItem key={index}>
-                        <div className="relative">
-                          <img src={image.imageUrl} alt={`Dish ${index + 1}`} className="w-full h-60 object-cover" />
-                          <button
-                            onClick={() => handleDeleteImage(image.id)}
-                            className="absolute top-2 right-2 p-1 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-colors"
-                          >
-                            <Trash2 size={20} />
-                          </button>
-                        </div>
+                      <CarouselItem key={index} className="relative">
+                        <img src={image.imageUrl} alt={`Dish ${index + 1}`} className="w-full h-full object-cover" />
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious />
-                  <CarouselNext />
+                  {dishImages.length > 1 && (
+                    <>
+                      <CarouselPrevious className="absolute left-2 top-1/2 transform -translate-y-1/2" />
+                      <CarouselNext className="absolute right-2 top-1/2 transform -translate-y-1/2" />
+                    </>
+                  )}
                 </Carousel>
               ) : (
-                <p>No images available</p>
+                <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                  <p>No images available</p>
+                </div>
               )}
-            </div>
-            
-            <div className="w-1/6 flex justify-end">
-              {dishImages.length < 6 && (
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>Add Image</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New Image</DialogTitle>
-                    </DialogHeader>
-                    <ImageUploader onImageUploaded={addDishImage} bucketName="itemImages" />
-                  </DialogContent>
-                </Dialog>
-              )}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 info-container">
-            <h2 className="text-xl font-semibold mb-2">{dishData.name}</h2>
-            <p>Item ID: {itemId}</p>
-            <p>Price: ${(dishData.price / 100).toFixed(2)}</p>
-            <p>Available: {dishData.available ? "Yes" : "No"}</p>
-            <p>Hidden: {dishData.hidden ? "Yes" : "No"}</p>
-          </div>
+            </CardBody>
+            <CardFooter className="absolute bg-black/40 bottom-0 z-10 border-t-1 border-default-600 dark:border-default-100">
+              <div className="flex flex-col flex-grow text-white">
+                <h4 className="text-white font-semibold text-lg mb-1">{dishData.name}</h4>
+                <p className="text-tiny">Item ID: {itemId}</p>
+                <p className="text-tiny">Price: ${(dishData.price / 100).toFixed(2)}</p>
+                <p className="text-tiny">Available: {dishData.available ? "Yes" : "No"}</p>
+                <p className="text-tiny">Hidden: {dishData.hidden ? "Yes" : "No"}</p>
+              </div>
+              <div className="flex space-x-2">
+                {dishImages.length < 6 && (
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        color="default" 
+                        variant="solid" 
+                        size="sm" 
+                        startContent={<Plus size={16} />}
+                        className="bg-black text-white"
+                      >
+                        Add Image
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Image</DialogTitle>
+                      </DialogHeader>
+                      <ImageUploader onImageUploaded={addDishImage} bucketName="itemImages" />
+                    </DialogContent>
+                  </Dialog>
+                )}
+                {dishImages.length > 0 && (
+                  <Button
+                    size="sm"
+                    color="danger"
+                    variant="solid"
+                    onClick={() => handleDeleteImage(dishImages[0].id)}
+                    startContent={<Trash2 size={16} />}
+                    className="font-semibold"
+                  >
+                    Delete Image
+                  </Button>
+                )}
+              </div>
+            </CardFooter>
+          </Card>
         </div>
       )}
+
+      <Accordion variant="splitted" className="max-w-[70%] mx-auto mt-8">
+        {modifierGroups.map((group) => (
+          <AccordionItem key={group.id} aria-label={group.name} title={group.name}>
+            <Table>
+              <TableCaption>{group.name} Modifiers</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Available</TableHead>
+                  <TableHead>Modified Time</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {group.modifiers.map((modifier) => (
+                  <TableRow key={modifier.id}>
+                    <TableCell>{modifier.name}</TableCell>
+                    <TableCell>${modifier.price.toFixed(2)}</TableCell>
+                    <TableCell>{modifier.available ? 'Yes' : 'No'}</TableCell>
+                    <TableCell>{new Date(modifier.modifiedTime).toLocaleString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </AccordionItem>
+        ))}
+      </Accordion>
     </div>
   );
 }
