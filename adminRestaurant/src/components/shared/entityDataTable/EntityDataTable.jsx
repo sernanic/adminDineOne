@@ -7,7 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
+import { Button as ShadcnButton } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -24,6 +24,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Pagination, Button, PaginationItemType } from "@nextui-org/react"
 
 export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
   console.log('DataTable props:', { data, columns, filterColumn }) // Add this line
@@ -32,6 +33,8 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
   const [columnFilters, setColumnFilters] = React.useState([])
   const [columnVisibility, setColumnVisibility] = React.useState({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const itemsPerPage = 10
 
   const table = useReactTable({
     data,
@@ -49,8 +52,15 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination: {
+        pageIndex: currentPage - 1,
+        pageSize: itemsPerPage,
+      },
     },
+    pageCount: Math.ceil(data.length / itemsPerPage),
   })
+
+  const totalPages = table.getPageCount()
 
   return (
     <div className="container mx-auto px-4">
@@ -143,30 +153,37 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
+      <div className="flex flex-col items-center gap-4 py-4">
+        <Pagination
+          total={totalPages}
+          color="secondary"
+          page={currentPage}
+          onChange={setCurrentPage}
+          classNames={{
+            item: "bg-transparent",
+            cursor: "bg-black text-white",
+          }}
+        />
+        <div className="flex gap-2">
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            variant="flat"
+            color="secondary"
+            onPress={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
           >
             Previous
           </Button>
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            variant="flat"
+            color="secondary"
+            onPress={() => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))}
           >
             Next
           </Button>
         </div>
       </div>
+
     </div>
   )
 }
