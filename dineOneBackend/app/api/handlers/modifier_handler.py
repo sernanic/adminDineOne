@@ -25,18 +25,17 @@ def syncModifierGroups():
 def getModifierGroups(merchantId):
     try:
         modifierGroups = SupabaseService.getModifierGroupsByMerchantId(merchantId)
-        
         modifierGroupsData = [{
             'id': group.modifierGroupId,
             'modifierGroupId': group.modifierGroupId,
             'name': group.name,
             'sortOrder': group.sortOrder,
             'deleted': group.deleted,
-            'modifiedTime': group.modifiedTime.isoformat() if group.modifiedTime else None,
         } for group in modifierGroups]
 
         return jsonify({"modifierGroups": modifierGroupsData}), 200
     except Exception as e:
+        print("error", e)
         return jsonify({"error": str(e)}), 500
 
 @modifierBp.route('/sync/modifiers', methods=['POST'])
@@ -115,4 +114,3 @@ def getItemModifierGroupsWithModifiers(merchantId, itemId):
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-# ... existing code ...

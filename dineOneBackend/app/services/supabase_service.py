@@ -8,6 +8,7 @@ from datetime import datetime
 from app.enums.integrations import IntegrationsEnum
 from app.models.categoryImages import CategoryImage
 from app.models.itemImages import ItemImage
+from app.models.modifier_group import ModifierGroup
 
 class SupabaseService:
 

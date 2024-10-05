@@ -24,14 +24,14 @@ export const columns = [
     enableHiding: false,
   },
   {
+    accessorKey: "modifierGroupId",
+    header: "ID",
+    cell: ({ row }) => <div>{(row.getValue("modifierGroupId"))}</div>,
+  },
+  {
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
-  },
-  {
-    accessorKey: "price",
-    header: "Price",
-    cell: ({ row }) => <div>${(row.getValue("price") / 100).toFixed(2)}</div>,
   },
   {
     accessorKey: "deleted",

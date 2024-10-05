@@ -103,7 +103,7 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
         </DropdownMenu>
         {onSync && (
           <Button
-            className="ml-4"
+            className="ml-4 bg-black text-white"
             onClick={onSync}
             disabled={isSyncing}
           >
@@ -164,24 +164,6 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
             cursor: "bg-black text-white",
           }}
         />
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="flat"
-            color="secondary"
-            onPress={() => setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev))}
-          >
-            Previous
-          </Button>
-          <Button
-            size="sm"
-            variant="flat"
-            color="secondary"
-            onPress={() => setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))}
-          >
-            Next
-          </Button>
-        </div>
       </div>
 
     </div>

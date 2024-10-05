@@ -4,7 +4,7 @@ import { useDataFetching } from "@/components/shared/entityDataTable/entityDataF
 import { columns } from "./AdditionsColumns"
 
 export default function Additions() {
-  const { data: additions, isLoading, error, syncMutation } = useDataFetching('modifiers', 'additions')
+  const { data: additions, isLoading, error, syncMutation } = useDataFetching('modifierGroups', 'additions')
 
   const [isSyncing, setIsSyncing] = React.useState(false)
 
