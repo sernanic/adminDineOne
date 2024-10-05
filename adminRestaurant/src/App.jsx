@@ -6,7 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/auth/PrivateRoute';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
-// ... other imports
+import {NextUIProvider} from "@nextui-org/react";
 
 // Import new components (you'll need to create these)
 import Home from './components/screens/Home';
@@ -18,6 +18,9 @@ import Settings from './components/screens/Settings';
 
 function App() {
   return (
+    <NextUIProvider>
+
+    
     <AuthProvider>
       <BrowserRouter>
         <Routes>
@@ -33,6 +36,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </NextUIProvider>
   );
 }
 

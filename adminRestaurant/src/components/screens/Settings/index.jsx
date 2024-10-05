@@ -5,13 +5,15 @@ import IntegrationsSettings from './IntegrationsSettings';
 import SupportSettings from './SupportSettings';
 import OrganizationsSettings from './OrganizationsSettings';
 import AdvancedSettings from './AdvancedSettings';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+// import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, Tab } from "@nextui-org/react";
+
 
 const Settings = () => {
     const [selectedTab, setSelectedTab] = useState('general');
 
-    const handleTabClick = (tab) => {
-        setSelectedTab(tab);
+    const handleSelectionChange = (key) => {
+        setSelectedTab(key);
     };
 
     const renderTabContent = () => {
@@ -34,36 +36,30 @@ const Settings = () => {
     };
 
     return (
-        <div className="container mx-auto px-4">
-            <h1 className="text-3xl font-bold mb-6">Settings</h1>
+        <div className="container mx-auto px-4 mt-8">
+            <div className="flex flex-wrap gap-4 mb-8">
+                <Tabs
+                    variant="underlined"
+                    aria-label="Settings tabs"
+                    selectedKey={selectedTab}
+                    onSelectionChange={handleSelectionChange}
+                >
+                    {[
+                        { name: 'General', id: 'general' },
+                        { name: 'Security', id: 'security' },
+                        { name: 'Integrations', id: 'integrations' },
+                        { name: 'Support', id: 'support' },
+                        { name: 'Organizations', id: 'organizations' },
+                        { name: 'Advanced', id: 'advanced' },
+                    ].map((item) => (
+                        <Tab key={item.id} title={item.name} />
+
+                    ))}
+                </Tabs>
+            </div>
             <div className="flex gap-10">
-                <div className="w-1/4 pr-6">
-                    <nav className="space-y-2">
-                        {[
-                            { name: 'General', id: 'general' },
-                            { name: 'Security', id: 'security' },
-                            { name: 'Integrations', id: 'integrations' },
-                            { name: 'Support', id: 'support' },
-                            { name: 'Organizations', id: 'organizations' },
-                            { name: 'Advanced', id: 'advanced' },
-                        ].map((item) => (
-                            <button
-                                key={item.id}
-                                className={`block text-left w-full ${
-                                    selectedTab === item.id
-                                        ? 'text-primary'
-                                        : 'text-gray-500'
-                                }`}
-                                onClick={() => handleTabClick(item.id)}
-                            >
-                                {item.name}
-                            </button>
-                        ))}
-                    </nav>
-                </div>
-                <div className="w-3/4 space-y-6">
-                    {renderTabContent()}
-                </div>
+                {renderTabContent()}
+
             </div>
         </div>
     );
