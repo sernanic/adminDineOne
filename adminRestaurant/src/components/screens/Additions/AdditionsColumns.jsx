@@ -2,6 +2,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
+import { useNavigate } from 'react-router-dom'
 
 export const columns = [
   {
@@ -43,6 +44,7 @@ export const columns = [
     enableHiding: false,
     cell: ({ row }) => {
       const addition = row.original
+      const navigate = useNavigate()
       console.log('Addition:', addition)
       return (
         <DropdownMenu>
@@ -59,7 +61,7 @@ export const columns = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Edit addition</DropdownMenuItem>
-            <DropdownMenuItem>View addition details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate(`/additions/merchant/${addition.merchantId}/additions/${addition.modifierGroupId}`)}>View addition details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

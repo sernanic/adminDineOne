@@ -5,6 +5,7 @@ import { getAuth } from 'firebase/auth';
 import ImageUploader from '../../shared/imageUploader';
 import { Pencil, Trash2 } from 'lucide-react'; // Import the icons
 import { Card, CardHeader, CardBody, CardFooter, Image, Button } from "@nextui-org/react";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
 import {
   Table,
@@ -131,8 +132,15 @@ export default function SectionDetails() {
     }
   };
 
+  const breadcrumbItems = [
+    { label: 'Home', link: '/' },
+    { label: 'Sections', link: '/sections' },
+    { label: sectionData ? sectionData.category.name : 'Section Details' },
+  ];
+
   return (
     <div className="container mx-auto mt-8">
+      <Breadcrumbs items={breadcrumbItems} />
       {sectionData && (
         <Card isFooterBlurred className="w-full max-w-[50%] mx-auto h-[300px] col-span-12 sm:col-span-7 mb-8">
           <CardHeader className="absolute z-10 top-1 flex-col items-start"></CardHeader>

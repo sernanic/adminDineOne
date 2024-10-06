@@ -167,7 +167,17 @@ class SupabaseService:
         :return: A list of Modifier objects
         """
         return Modifier.query.filter_by(merchantId=merchantId).all()
-    
+
+    @staticmethod
+    def getModifiers(merchantId, modifierGroupId):
+        """
+        Retrieve all modifiers for a given merchantId and modifierGroupId.
+        
+        :param merchantId: The ID of the merchant
+        :param modifierGroupId: The ID of the modifier group
+        :return: A list of Modifier objects
+        """
+        return Modifier.query.filter_by(merchantId=merchantId, modifierGroupId=modifierGroupId).all()
 
     @staticmethod
     def insertOrUpdateModifier(modifierData, merchantId):

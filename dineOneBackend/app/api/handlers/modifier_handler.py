@@ -31,6 +31,7 @@ def getModifierGroups(merchantId):
             'name': group.name,
             'sortOrder': group.sortOrder,
             'deleted': group.deleted,
+            'merchantId': group.merchantId
         } for group in modifierGroups]
 
         return jsonify({"modifierGroups": modifierGroupsData}), 200
@@ -58,6 +59,26 @@ def getModifiers(merchantId):
         modifiers = SupabaseService.getModifiersByMerchantId(merchantId)
         
         # Convert modifiers to a list of dictionaries
+        modifiersData = [{
+            'modifierId': modifier.modifierId,
+            'merchantId': modifier.merchantId,
+            'name': modifier.name,
+            'available': modifier.available,
+            'price': float(modifier.price),  # Convert Decimal to float for JSON serialization
+            'modifiedTime': modifier.modifiedTime.isoformat() if modifier.modifiedTime else None,
+            'modifierGroupId': modifier.modifierGroupId,
+            'deleted': modifier.deleted
+        } for modifier in modifiers]
+
+        return jsonify({"modifiers": modifiersData}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@modifierBp.route('/modifiers/<merchantId>/modifierGroup/<modifierGroupId>', methods=['GET'])
+def getModifiersByModifierGroupId(merchantId, modifierGroupId):
+    try:
+        modifiers = SupabaseService.getModifiers(merchantId, modifierGroupId)
+        
         modifiersData = [{
             'modifierId': modifier.modifierId,
             'merchantId': modifier.merchantId,

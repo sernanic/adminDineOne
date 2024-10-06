@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 import ImageUploader from '../../shared/imageUploader';
 import { Plus, Trash2 } from 'lucide-react';
 import {Accordion, AccordionItem} from "@nextui-org/react";
+import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
-// ... existing imports ...
-
-// Add these new imports
 import {
   Carousel,
   CarouselContent,
@@ -25,7 +23,6 @@ import {
 } from "@/components/ui/dialog"
 import { Card, CardHeader, CardBody, CardFooter,Button } from "@nextui-org/react";
 
-// Add these new imports for the Shadcn UI table components
 import {
   Table,
   TableBody,
@@ -129,12 +126,19 @@ function DishDetails() {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>An error occurred: {error.message}</div>;
 
+  const breadcrumbItems = [
+    { label: 'Home', link: '/' },
+    { label: 'Dishes', link: '/dishes' },
+    { label: dishData ? dishData.name : 'Dish Details' },
+  ];
+
   return (
     <div className="container mx-auto mt-8">
-      <h1 className="text-2xl font-bold mb-4">Dish Details</h1>
+      <Breadcrumbs items={breadcrumbItems} />
+      
       {dishData && (
         <div className="relative w-full max-w-[50%] mx-auto">
-          <Card isFooterBlurred className="w-full h-[400px] col-span-12 sm:col-span-7 mb-8">
+          <Card isFooterBlurred className="w-full h-[400px] col-span-12 sm:col-span-7 mb-8 mt-[50px]">
             <CardBody className="p-0 overflow-hidden">
               {dishImages.length > 0 ? (
                 <Carousel className="w-full h-full">

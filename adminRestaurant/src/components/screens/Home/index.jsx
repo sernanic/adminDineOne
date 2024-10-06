@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <div className="container mx-auto px-4">
-      <h1 className="text-2xl mb-8">Welcome, {currentUser.email}</h1>
+      <h1 className="text-2xl mb-8">Welcome, {currentUser.email} 👋</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">

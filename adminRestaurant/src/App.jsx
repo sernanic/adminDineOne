@@ -7,6 +7,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import PrivateRoute from './components/auth/PrivateRoute';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
+import Login from './components/auth/login';
 
 // Import new components (you'll need to create these)
 import Home from './components/screens/Home';
@@ -17,6 +18,7 @@ import Dishes from './components/screens/Dishes';
 import Settings from './components/screens/Settings';
 import SectionDetails from './components/screens/Sections/SectionDetails';
 import DishDetails from './components/screens/Dishes/DishDetails';
+import AdditionDetails from './components/screens/Additions/AdditionsDetails';
 
 function App() {
   return (
@@ -24,7 +26,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signin" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
           <Route path="/sections" element={<PrivateRoute><Sections /></PrivateRoute>} />
@@ -33,6 +35,10 @@ function App() {
             element={<PrivateRoute><SectionDetails /></PrivateRoute>} 
           />
           <Route path="/additions" element={<PrivateRoute><Additions /></PrivateRoute>} />
+          <Route 
+            path="/additions/merchant/:merchantId/additions/:modifierGroupId" 
+            element={<PrivateRoute><AdditionDetails /></PrivateRoute>} 
+          />
           <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
           <Route path="/dishes" element={<PrivateRoute><Dishes /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
