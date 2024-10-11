@@ -21,6 +21,7 @@ def syncModifierGroups():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @modifierBp.route('/modifierGroups/<merchantId>', methods=['GET'])
 def getModifierGroups(merchantId):
     try:
@@ -32,12 +33,14 @@ def getModifierGroups(merchantId):
             'sortOrder': group.sortOrder,
             'deleted': group.deleted,
             'merchantId': group.merchantId
+            
         } for group in modifierGroups]
 
         return jsonify({"modifierGroups": modifierGroupsData}), 200
     except Exception as e:
         print("error", e)
         return jsonify({"error": str(e)}), 500
+
 
 @modifierBp.route('/sync/modifiers', methods=['POST'])
 @firebase_auth_required
@@ -111,11 +114,8 @@ def getItemModifierGroupsWithModifiers(merchantId, itemId):
                 'items': group['items'],
                 'modifiers': []
             }
-            print("group_data", group)
-            
             # Fetch modifiers for each group
             modifiers_raw = SupabaseService.getModifiersByIds(group['modifierIds'])
-            print("modifiers_raw:", modifiers_raw)
 
             group_data['modifiers'] = [{
                 'id': modifier.modifierId,
@@ -135,3 +135,91 @@ def getItemModifierGroupsWithModifiers(merchantId, itemId):
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+@modifierBp.route('/merchant/<merchantId>/modifier/<modifierId>', methods=['GET'])
+def getModifierById(merchantId, modifierId):
+    try:
+        modifier = SupabaseService.getModifierById(merchantId, modifierId)
+        
+        if not modifier:
+            return jsonify({"error": "Modifier not found"}), 404
+        
+        modifierData = {
+            'modifierId': modifier.modifierId,
+            'merchantId': modifier.merchantId,
+            'name': modifier.name,
+            'available': modifier.available,
+            'price': float(modifier.price),  # Convert Decimal to float for JSON serialization
+            'modifiedTime': modifier.modifiedTime.isoformat() if modifier.modifiedTime else None,
+            'modifierGroupId': modifier.modifierGroupId,
+            'deleted': modifier.deleted
+        }
+
+        return jsonify({"modifier": modifierData}), 200
+    except Exception as e:
+        logging.error(f"Error fetching modifier: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@modifierBp.route('/modifier/image', methods=['POST'])
+@firebase_auth_required
+def addModifierImage():
+    try:
+        data = request.json
+        modifierId = data.get('modifierId')
+        imageUrl = data.get('imageUrl')
+
+        if not modifierId or not imageUrl:
+            return jsonify({"error": "Both modifierId and imageUrl are required"}), 400
+
+        modifierImage = SupabaseService.insertModifierImage(modifierId, imageUrl)
+
+        return jsonify({
+            "message": "Modifier image added successfully",
+            "modifierImage": {
+                "id": modifierImage.id,
+                "modifierId": modifierImage.modifierId,
+                "imageUrl": modifierImage.imageUrl
+            }
+        }), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@modifierBp.route('/modifier/<modifierId>/image', methods=['GET'])
+def getModifierImage(modifierId):
+    try:
+        modifierImage = SupabaseService.getModifierImageByModifierId(modifierId)
+        
+        if modifierImage:
+            imageData = {
+                'id': modifierImage.id,
+                'modifierId': modifierImage.modifierId,
+                'imageUrl': modifierImage.imageUrl
+            }
+            return jsonify({"modifierImage": imageData}), 200
+        else:
+            return jsonify({"modifierImage": None}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@modifierBp.route('/modifier/<modifierId>/image', methods=['PUT'])
+@firebase_auth_required
+def updateModifierImage(modifierId):
+    try:
+        data = request.json
+        imageUrl = data.get('imageUrl')
+
+        if not imageUrl:
+            return jsonify({"error": "imageUrl is required"}), 400
+
+        updatedModifierImage = SupabaseService.updateModifierImage(modifierId, imageUrl)
+
+        if updatedModifierImage:
+            imageData = {
+                'id': updatedModifierImage.id,
+                'modifierId': updatedModifierImage.modifierId,
+                'imageUrl': updatedModifierImage.imageUrl
+            }
+            return jsonify({"message": "Modifier image updated successfully", "modifierImage": imageData}), 200
+        else:
+            return jsonify({"error": "Modifier image not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

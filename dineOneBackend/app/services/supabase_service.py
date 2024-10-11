@@ -9,6 +9,7 @@ from app.enums.integrations import IntegrationsEnum
 from app.models.categoryImages import CategoryImage
 from app.models.itemImages import ItemImage
 from app.models.modifier_group import ModifierGroup
+from app.models.modifierImages import ModifierImage
 
 class SupabaseService:
 
@@ -451,3 +452,33 @@ class SupabaseService:
         modifiers = Modifier.query.filter(Modifier.modifierId.in_(id_list)).all()
 
         return modifiers
+    
+    @staticmethod
+    def getModifierById(merchantId,modifierId ):
+        """
+        Retrieve a single modifier based on modifierId and merchantId
+
+        :param modifierId: A string representing the modifier ID
+        :param merchantId: A string representing the merchant ID
+        :return: A Modifier object or None if not found
+        """
+        return Modifier.query.filter_by(modifierId=modifierId, merchantId=merchantId).first()
+
+    @staticmethod
+    def insertModifierImage(modifierId, imageUrl):
+        modifierImage = ModifierImage(imageUrl=imageUrl, modifierId=modifierId)
+        db.session.add(modifierImage)
+        db.session.commit()
+        return modifierImage
+
+    @staticmethod
+    def getModifierImageByModifierId(modifierId):
+        return ModifierImage.query.filter_by(modifierId=modifierId).first()
+
+    @staticmethod
+    def updateModifierImage(modifierId, imageUrl):
+        modifierImage = ModifierImage.query.filter_by(modifierId=modifierId).first()
+        if modifierImage:
+            modifierImage.imageUrl = imageUrl
+            db.session.commit()
+        return modifierImage

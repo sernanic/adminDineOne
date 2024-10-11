@@ -19,6 +19,7 @@ import Settings from './components/screens/Settings';
 import SectionDetails from './components/screens/Sections/SectionDetails';
 import DishDetails from './components/screens/Dishes/DishDetails';
 import AdditionDetails from './components/screens/Additions/AdditionsDetails';
+import ModifierDetails from './components/screens/Additions/ModifierDetails'; // Add this import
 
 function App() {
   return (
@@ -47,6 +48,11 @@ function App() {
           <Route 
             path="/dishes/merchant/:merchantId/dishes/:itemId" 
             element={<PrivateRoute><DishDetails /></PrivateRoute>} 
+          />
+          {/* Add the new route for ModifierDetails */}
+          <Route 
+            path="/modifiers/:merchantId/modifier/:modifierId" 
+            element={<PrivateRoute><ModifierDetails /></PrivateRoute>} 
           />
         </Routes>
       </BrowserRouter>

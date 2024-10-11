@@ -2,15 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { DataTable } from "@/components/shared/entityDataTable/EntityDataTable"
+import { columns } from "./ModifierColumns"
 
 const AdditionsDetails = () => {
   const { merchantId, modifierGroupId } = useParams();
@@ -46,31 +39,17 @@ const AdditionsDetails = () => {
   ];
 
   return (
-    <div className="container mx-auto mt-8">
+    <div className="flex flex-col w-full h-full p-4">
       <Breadcrumbs items={breadcrumbItems} />
-      <div className="additionsDetails mt-4">
-        <h3 className="text-xl font-semibold mb-2">Modifiers</h3>
-        <Table>
-          <TableCaption>Modifiers for this addition</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Available</TableHead>
-              <TableHead>Modified Time</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {modifiers.map((modifier) => (
-              <TableRow key={modifier.modifierId}>
-                <TableCell>{modifier.name}</TableCell>
-                <TableCell>${modifier.price.toFixed(2)}</TableCell>
-                <TableCell>{modifier.available ? 'Yes' : 'No'}</TableCell>
-                <TableCell>{new Date(modifier.modifiedTime).toLocaleString()}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <div className="flex justify-center items-center mt-4" style={{width: '100%', height: '100%'}}>
+        <div className="bg-white rounded-lg p-4" style={{width: '95%', height: '100%'}}>
+          <h3 className="text-xl font-semibold mb-2">Modifiers for {modifierGroupName}</h3>
+          <DataTable
+            data={modifiers}
+            columns={columns}
+            filterColumn="name"
+          />
+        </div>
       </div>
     </div>
   );
