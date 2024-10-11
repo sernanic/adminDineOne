@@ -13,7 +13,6 @@ def syncModifierGroups():
     try:
         merchantId = "6JDE8MZSA6FJ1"
         modifierGroups = CloverService.fetchModifierGroups(merchantId)
-        print("modifierGroups", modifierGroups)
         for modifierGroupData in modifierGroups:
             SupabaseService.insertOrUpdateModifierGroup(modifierGroupData, merchantId)
 
@@ -48,7 +47,6 @@ def syncModifiers():
     try:
         merchantId = "6JDE8MZSA6FJ1"
         modifiers = CloverService.fetchModifiers(merchantId)
-        print("modifierGroups", modifiers)
         for modifierData in modifiers:
             SupabaseService.insertOrUpdateModifier(modifierData, merchantId)
 
@@ -165,13 +163,12 @@ def addModifierImage():
     try:
         data = request.json
         modifierId = data.get('modifierId')
-        imageUrl = data.get('imageUrl')
+        imageUrl = data.get('imageURL')
 
         if not modifierId or not imageUrl:
             return jsonify({"error": "Both modifierId and imageUrl are required"}), 400
 
         modifierImage = SupabaseService.insertModifierImage(modifierId, imageUrl)
-
         return jsonify({
             "message": "Modifier image added successfully",
             "modifierImage": {
@@ -192,7 +189,7 @@ def getModifierImage(modifierId):
             imageData = {
                 'id': modifierImage.id,
                 'modifierId': modifierImage.modifierId,
-                'imageUrl': modifierImage.imageUrl
+                'imageURL': modifierImage.imageUrl
             }
             return jsonify({"modifierImage": imageData}), 200
         else:

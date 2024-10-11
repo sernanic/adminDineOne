@@ -41,7 +41,6 @@ const ModifierDetails = () => {
       if (!user) {
         throw new Error('User not authenticated');
       }
-
       const token = await user.getIdToken();
 
       const response = await axios.post('http://127.0.0.1:4000/modifier/image', {
