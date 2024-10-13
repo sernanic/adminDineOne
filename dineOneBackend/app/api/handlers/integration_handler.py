@@ -1,12 +1,12 @@
 from flask import jsonify, Blueprint, request
 from app.services.supabase_service import SupabaseService
-from app.utils.auth_middleware import firebase_auth_required
+from app.utils.auth_middleware import firebaseAuthRequired
 from app.frontend.integrationsFrontend import save_integration
 
 integrationBp = Blueprint('integrationBp', __name__)
 
 @integrationBp.route('/clover/integration', methods=['POST'])
-@firebase_auth_required
+@firebaseAuthRequired
 def saveIntegration():
     try:
         data = request.json
@@ -24,7 +24,7 @@ def saveIntegration():
         return jsonify({"error": str(e)}), 500
 
 @integrationBp.route('/integrations/<clientId>', methods=['GET'])
-@firebase_auth_required
+@firebaseAuthRequired
 def getIntegration(clientId):
     try:
         integration = SupabaseService.getIntegrationByClientId(clientId)
@@ -41,7 +41,7 @@ def getIntegration(clientId):
         return jsonify({"error": str(e)}), 500
 
 @integrationBp.route('/clover/integration/<clientId>', methods=['GET'])
-@firebase_auth_required
+@firebaseAuthRequired
 def getCloverIntegration(clientId):
     try:
         integration = SupabaseService.getCloverIntegrationByClientId(clientId)

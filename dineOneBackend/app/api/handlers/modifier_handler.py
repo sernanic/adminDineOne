@@ -1,20 +1,22 @@
 from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
-from app.utils.auth_middleware import firebase_auth_required
+from app.utils.auth_middleware import firebaseAuthRequired
 import json
 import logging
 
 modifierBp = Blueprint('modifierBp', __name__)
 
 @modifierBp.route('/sync/modifierGroups', methods=['POST'])
-@firebase_auth_required
+@firebaseAuthRequired
 def syncModifierGroups():
-    try:
+    currentUser = request.currentUser
+    clientId = request.clientId
+    try:        
         merchantId = "6JDE8MZSA6FJ1"
         modifierGroups = CloverService.fetchModifierGroups(merchantId)
         for modifierGroupData in modifierGroups:
-            SupabaseService.insertOrUpdateModifierGroup(modifierGroupData, merchantId)
+            SupabaseService.insertOrUpdateModifierGroup(modifierGroupData, merchantId, clientId)
 
         return jsonify({"message": "Modifier groups synced successfully"}), 200
     except Exception as e:
@@ -22,9 +24,12 @@ def syncModifierGroups():
 
 
 @modifierBp.route('/modifierGroups/<merchantId>', methods=['GET'])
+@firebaseAuthRequired
 def getModifierGroups(merchantId):
+    currentUser = request.currentUser
+    clientId = request.clientId
     try:
-        modifierGroups = SupabaseService.getModifierGroupsByMerchantId(merchantId)
+        modifierGroups = SupabaseService.getModifierGroupsByMerchantId(merchantId, clientId)
         modifierGroupsData = [{
             'id': group.modifierGroupId,
             'modifierGroupId': group.modifierGroupId,
@@ -42,22 +47,27 @@ def getModifierGroups(merchantId):
 
 
 @modifierBp.route('/sync/modifiers', methods=['POST'])
-@firebase_auth_required
+@firebaseAuthRequired
 def syncModifiers():
     try:
+        currentUser = request.currentUser
+        clientId = request.clientId
         merchantId = "6JDE8MZSA6FJ1"
         modifiers = CloverService.fetchModifiers(merchantId)
         for modifierData in modifiers:
-            SupabaseService.insertOrUpdateModifier(modifierData, merchantId)
+            SupabaseService.insertOrUpdateModifier(modifierData, merchantId, clientId)
 
         return jsonify({"message": "Modifier groups synced successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @modifierBp.route('/modifiers/<merchantId>', methods=['GET'])
+@firebaseAuthRequired
 def getModifiers(merchantId):
     try:
-        modifiers = SupabaseService.getModifiersByMerchantId(merchantId)
+        currentUser = request.currentUser
+        clientId = request.clientId
+        modifiers = SupabaseService.getModifiersByMerchantId(merchantId, clientId)
         
         # Convert modifiers to a list of dictionaries
         modifiersData = [{
@@ -76,9 +86,12 @@ def getModifiers(merchantId):
         return jsonify({"error": str(e)}), 500
     
 @modifierBp.route('/modifiers/<merchantId>/modifierGroup/<modifierGroupId>', methods=['GET'])
+@firebaseAuthRequired
 def getModifiersByModifierGroupId(merchantId, modifierGroupId):
     try:
-        modifiers = SupabaseService.getModifiers(merchantId, modifierGroupId)
+        currentUser = request.currentUser
+        clientId = request.clientId
+        modifiers = SupabaseService.getModifiers(merchantId, modifierGroupId, clientId)
         
         modifiersData = [{
             'modifierId': modifier.modifierId,
@@ -93,10 +106,14 @@ def getModifiersByModifierGroupId(merchantId, modifierGroupId):
 
         return jsonify({"modifiers": modifiersData}), 200
     except Exception as e:
+        print("error", e)
         return jsonify({"error": str(e)}), 500
 
 @modifierBp.route('/item/<merchantId>/<itemId>/modifierGroups', methods=['GET'])
+@firebaseAuthRequired
 def getItemModifierGroupsWithModifiers(merchantId, itemId):
+    currentUser = request.currentUser
+    clientId = request.clientId
     try:
         modifier_groups_raw = CloverService.fetchItemModifierGroups(merchantId, itemId)
         modifier_groups = modifier_groups_raw['modifierGroups']['elements']
@@ -113,7 +130,7 @@ def getItemModifierGroupsWithModifiers(merchantId, itemId):
                 'modifiers': []
             }
             # Fetch modifiers for each group
-            modifiers_raw = SupabaseService.getModifiersByIds(group['modifierIds'])
+            modifiers_raw = SupabaseService.getModifiersByIds(group['modifierIds'], clientId)
 
             group_data['modifiers'] = [{
                 'id': modifier.modifierId,
@@ -134,9 +151,13 @@ def getItemModifierGroupsWithModifiers(merchantId, itemId):
         return jsonify({"error": str(e)}), 500
 
 @modifierBp.route('/merchant/<merchantId>/modifier/<modifierId>', methods=['GET'])
+@firebaseAuthRequired
 def getModifierById(merchantId, modifierId):
+    currentUser = request.currentUser
+    clientId = request.clientId
+
     try:
-        modifier = SupabaseService.getModifierById(merchantId, modifierId)
+        modifier = SupabaseService.getModifierById(merchantId, modifierId, clientId)
         
         if not modifier:
             return jsonify({"error": "Modifier not found"}), 404
@@ -155,12 +176,15 @@ def getModifierById(merchantId, modifierId):
         return jsonify({"modifier": modifierData}), 200
     except Exception as e:
         logging.error(f"Error fetching modifier: {str(e)}")
+        print("error", e)
         return jsonify({"error": str(e)}), 500
 
 @modifierBp.route('/modifier/image', methods=['POST'])
-@firebase_auth_required
+@firebaseAuthRequired
 def addModifierImage():
     try:
+        currentUser = request.currentUser
+        clientId = request.clientId
         data = request.json
         modifierId = data.get('modifierId')
         imageUrl = data.get('imageURL')
@@ -168,7 +192,7 @@ def addModifierImage():
         if not modifierId or not imageUrl:
             return jsonify({"error": "Both modifierId and imageUrl are required"}), 400
 
-        modifierImage = SupabaseService.insertModifierImage(modifierId, imageUrl)
+        modifierImage = SupabaseService.insertModifierImage(modifierId, imageUrl, clientId)
         return jsonify({
             "message": "Modifier image added successfully",
             "modifierImage": {
@@ -181,9 +205,12 @@ def addModifierImage():
         return jsonify({"error": str(e)}), 500
 
 @modifierBp.route('/modifier/<modifierId>/image', methods=['GET'])
+@firebaseAuthRequired
 def getModifierImage(modifierId):
     try:
-        modifierImage = SupabaseService.getModifierImageByModifierId(modifierId)
+        currentUser = request.currentUser
+        clientId = request.clientId
+        modifierImage = SupabaseService.getModifierImageByModifierId(modifierId, clientId)
         
         if modifierImage:
             imageData = {
@@ -198,16 +225,18 @@ def getModifierImage(modifierId):
         return jsonify({"error": str(e)}), 500
 
 @modifierBp.route('/modifier/<modifierId>/image', methods=['PUT'])
-@firebase_auth_required
+@firebaseAuthRequired
 def updateModifierImage(modifierId):
     try:
+        currentUser = request.currentUser
+        clientId = request.clientId
         data = request.json
         imageUrl = data.get('imageUrl')
 
         if not imageUrl:
             return jsonify({"error": "imageUrl is required"}), 400
 
-        updatedModifierImage = SupabaseService.updateModifierImage(modifierId, imageUrl)
+        updatedModifierImage = SupabaseService.updateModifierImage(modifierId, imageUrl, clientId)
 
         if updatedModifierImage:
             imageData = {

@@ -1,33 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import { DataTable } from "@/components/shared/entityDataTable/EntityDataTable"
 import { columns } from "./ModifierColumns"
+import { useDataFetching } from "@/components/shared/entityDataTable/entityDataFetching"
 
 const AdditionsDetails = () => {
   const { merchantId, modifierGroupId } = useParams();
-  const [modifiers, setModifiers] = useState([]);
   const [modifierGroupName, setModifierGroupName] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: modifiers, isLoading, error, syncMutation } = useDataFetching('modifiers', 'modifiers', { merchantId, modifierGroupId });
+  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
-    const fetchModifiers = async () => {
+    // Fetch modifier group name
+    const fetchModifierGroupName = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:4000/modifiers/${merchantId}/modifierGroup/${modifierGroupId}`);
-        setModifiers(response.data.modifiers);
-        setModifierGroupName(response.data.modifierGroupName || 'Addition Details');
-        setIsLoading(false);
+        const auth = getAuth();
+        const user = auth.currentUser;
+        
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const idToken = await user.getIdToken();
+        
+        const response = await axios.get(`http://127.0.0.1:4000/modifierGroups/${merchantId}/${modifierGroupId}`, {
+          headers: {
+            Authorization: `Bearer ${idToken}`
+          }
+        });
+        
+        setModifierGroupName(response.data.name || 'Addition Details');
       } catch (error) {
-        console.error("Error fetching modifiers:", error);
-        setError(error);
-        setIsLoading(false);
+        console.error("Error fetching modifier group name:", error);
       }
     };
 
-    fetchModifiers();
+    fetchModifierGroupName();
   }, [merchantId, modifierGroupId]);
+
+  const handleSync = () => {
+    setIsSyncing(true);
+    syncMutation.mutate(null, {
+      onSettled: () => setIsSyncing(false)
+    });
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>An error occurred: {error.message}</div>;
@@ -48,6 +67,8 @@ const AdditionsDetails = () => {
             data={modifiers}
             columns={columns}
             filterColumn="name"
+            onSync={handleSync}
+            isSyncing={isSyncing}
           />
         </div>
       </div>

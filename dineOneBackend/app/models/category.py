@@ -10,13 +10,14 @@ class Category(db.Model):
     name = db.Column(TEXT, nullable=False)
     sortOrder = db.Column(INTEGER, nullable=True)
     deleted = db.Column(BOOLEAN, nullable=False, default=False)
+    clientId = db.Column(BIGINT, nullable=False)
 
-    def __init__(self, categoryId, merchantId, name, sortOrder=None, deleted=False):
+    def __init__(self, categoryId, merchantId, name, sortOrder=None, deleted=False, clientId=None):
         self.categoryId = categoryId
         self.merchantId = merchantId
         self.name = name
         self.sortOrder = sortOrder
         self.deleted = deleted
-
+        self.clientId = clientId
     def __repr__(self):
         return f"<Category {self.name}>"

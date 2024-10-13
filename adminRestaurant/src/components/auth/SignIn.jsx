@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -14,6 +14,8 @@ export default function SignIn() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setError('');
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/');
@@ -24,37 +26,33 @@ export default function SignIn() {
   }
 
   return (
-    <Card className="w-[350px] mx-auto mt-10">
-      <CardHeader>
-        <CardTitle>Sign In</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit}>
-          {error && <p className="text-red-500">{error}</p>}
-          <div className="mb-4">
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full">Sign In</Button>
-        </form>
-      </CardContent>
-      <CardFooter>
-        Need an account? <Button variant="link" onClick={() => navigate('/signup')}>Sign Up</Button>
-      </CardFooter>
-    </Card>
+    <form className="space-y-4" onSubmit={handleSubmit}>
+      {error && <p className="text-red-500 text-center">{error}</p>}
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input 
+          id="email" 
+          type="email" 
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input 
+          id="password" 
+          type="password" 
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
+      <Button className="w-full" type="submit">
+        Sign In
+      </Button>
+    </form>
   );
 }

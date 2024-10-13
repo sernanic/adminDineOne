@@ -10,16 +10,20 @@ from app.models.categoryImages import CategoryImage
 from app.models.itemImages import ItemImage
 from app.models.modifier_group import ModifierGroup
 from app.models.modifierImages import ModifierImage
+from app.models.client import Client
+from app.models.user import User
 
 class SupabaseService:
 
     @staticmethod
-    def insert_or_update_item(item_data, merchant_id):
-        item = Item.query.filter_by(item_id=item_data['id']).first()  # Use Clover's id to find the item
-        print("item", item)
+    def insertOrUpdateItem(item_data, merchant_id, client_id):
+        item = Item.query.filter_by(item_id=item_data['id'], merchant_id=merchant_id, clientId=client_id).first()  # Use Clover's id to find the item
         modified_time = datetime.fromtimestamp(item_data.get('modifiedTime', datetime.now().timestamp() * 1000) / 1000.0)
+        print(type(client_id))
         if item:
             # Update existing item
+            if item.clientId != client_id:
+                raise ValueError("Item does not belong to the specified client")
             item.item_id = item_data['id']
             item.hidden = item_data.get('hidden', item.hidden)
             item.available = item_data.get('available', item.available)
@@ -48,27 +52,30 @@ class SupabaseService:
                 is_revenue=item_data.get('isRevenue', False),
                 modified_time=modified_time,
                 deleted=item_data.get('deleted', False),
-                merchant_id=merchant_id
+                merchant_id=merchant_id,
+                clientId=client_id
             )
             db.session.add(item)
 
         db.session.commit()
 
     @staticmethod
-    def get_items_by_merchant_id(merchant_id):
+    def getItemsByMerchantId(merchant_id, clientId):
         """
         Retrieve all items for a given merchant_id.
         
         :param merchant_id: The ID of the merchant
         :return: A list of Item objects
         """
-        return Item.query.filter_by(merchant_id=merchant_id).all()
+        return Item.query.filter_by(merchant_id=merchant_id, clientId=clientId).all()
 
     @staticmethod
-    def insert_or_update_category(category_data, merchant_id):
-        category = Category.query.filter_by(categoryId=category_data['id']).first()  # Use Clover's id to find the category
+    def insert_or_update_category(category_data, merchant_id, client_id):
+        category = Category.query.filter_by(categoryId=category_data['id'], merchantId=merchant_id, clientId=client_id).first()  # Use Clover's id to find the category
         if category:
             # Update existing category
+            if category.clientId != client_id:
+                raise ValueError("Category does not belong to the specified client")
             category.categoryId = category_data['id']
             category.name = category_data['name']
             category.sortOrder = category_data.get('sortOrder', category.sortOrder)
@@ -81,33 +88,36 @@ class SupabaseService:
                 name=category_data['name'],
                 sortOrder=category_data.get('sortOrder', None),
                 deleted=category_data.get('deleted', False),
-                merchantId=merchant_id
+                merchantId=merchant_id,
+                clientId=client_id
             )
             db.session.add(category)
 
         db.session.commit()
 
     @staticmethod
-    def getCategoriesByMerchantId(merchant_id):
+    def getCategoriesByMerchantId(merchant_id, client_id):
         """
         Retrieve all categories for a given merchant_id.
         
         :param merchant_id: The ID of the merchant
         :return: A list of Category objects
         """
-        return Category.query.filter_by(merchantId=merchant_id).all()
+        return Category.query.filter_by(merchantId=merchant_id, clientId=client_id).all()
 
     @staticmethod
-    def getCategoryById(merchant_id, category_id):
-        return Category.query.filter_by(merchantId=merchant_id, categoryId=category_id).first()
+    def getCategoryById(merchant_id, category_id, client_id):
+        return Category.query.filter_by(merchantId=merchant_id, categoryId=category_id, clientId=client_id).first()
 
     @staticmethod
-    def insertOrUpdateItemGroup(itemGroupData, merchantId):
-        itemGroup = ItemGroup.query.filter_by(itemGroupId=itemGroupData['id']).first()
+    def insertOrUpdateItemGroup(itemGroupData, merchantId, clientId):
+        itemGroup = ItemGroup.query.filter_by(itemGroupId=itemGroupData['id'], merchantId=merchantId, clientId=clientId).first()
         modifiedTime = datetime.fromtimestamp(itemGroupData.get('modifiedTime', datetime.now().timestamp() * 1000) / 1000.0)
         
         if itemGroup:
             # Update existing item group
+            if itemGroup.clientId != clientId:
+                raise ValueError("ItemGroup does not belong to the specified client")
             itemGroup.name = itemGroupData['name']
             itemGroup.sortOrder = itemGroupData.get('sortOrder')
             itemGroup.deleted = itemGroupData.get('deleted', False)
@@ -120,32 +130,34 @@ class SupabaseService:
                 sortOrder=itemGroupData.get('sortOrder'),
                 deleted=itemGroupData.get('deleted', False),
                 modifiedTime=modifiedTime,
-                merchantId=merchantId
+                merchantId=merchantId,
+                clientId=clientId
             )
             db.session.add(itemGroup)
 
         db.session.commit()
 
     @staticmethod
-    def getItemGroupsByMerchantId(merchantId):
-        return ItemGroup.query.filter_by(merchantId=merchantId).all()
+    def getItemGroupsByMerchantId(merchantId, clientId):
+        return ItemGroup.query.filter_by(merchantId=merchantId, clientId=clientId).all()
 
     @staticmethod
-    def insertOrUpdateModifierGroup(modifierGroupData, merchantId):
-        modifierGroup = ModifierGroup.query.filter_by(modifierGroupId=modifierGroupData['id']).first()
+    def insertOrUpdateModifierGroup(modifierGroupData, merchantId, clientId):
+        modifierGroup = ModifierGroup.query.filter_by(modifierGroupId=modifierGroupData['id'], merchantId=merchantId, clientId=clientId).first()
         if modifierGroup:
             # Update existing modifier group
-            print("existing modifier group")
+            if modifierGroup.clientId != clientId:
+                raise ValueError("ModifierGroup does not belong to the specified client")
             modifierGroup.name = modifierGroupData['name']
             modifierGroup.showByDefault = modifierGroupData.get('showByDefault', modifierGroup.showByDefault)
             modifierGroup.sortOrder = modifierGroupData.get('sortOrder', modifierGroup.sortOrder)
             modifierGroup.deleted = modifierGroupData.get('deleted', modifierGroup.deleted)
         else:
             # Insert new modifier group
-            print("new modifier group")
             modifierGroup = ModifierGroup(
                 modifierGroupId=modifierGroupData['id'],
                 merchantId=merchantId,
+                clientId=clientId,
                 name=modifierGroupData['name'],
                 showByDefault=modifierGroupData.get('showByDefault', False),
                 sortOrder=modifierGroupData.get('sortOrder', 0),
@@ -156,21 +168,21 @@ class SupabaseService:
         db.session.commit()
 
     @staticmethod
-    def getModifierGroupsByMerchantId(merchantId):
-        return ModifierGroup.query.filter_by(merchantId=merchantId).all()
+    def getModifierGroupsByMerchantId(merchantId, clientId):
+        return ModifierGroup.query.filter_by(merchantId=merchantId, clientId=clientId).all()
 
     @staticmethod
-    def getModifiersByMerchantId(merchantId):
+    def getModifiersByMerchantId(merchantId, clientId):
         """
         Retrieve all modifiers for a given merchant_id.
         
         :param merchant_id: The ID of the merchant
         :return: A list of Modifier objects
         """
-        return Modifier.query.filter_by(merchantId=merchantId).all()
+        return Modifier.query.filter_by(merchantId=merchantId, clientId=clientId).all()
 
     @staticmethod
-    def getModifiers(merchantId, modifierGroupId):
+    def getModifiers(merchantId, modifierGroupId, clientId):
         """
         Retrieve all modifiers for a given merchantId and modifierGroupId.
         
@@ -178,15 +190,17 @@ class SupabaseService:
         :param modifierGroupId: The ID of the modifier group
         :return: A list of Modifier objects
         """
-        return Modifier.query.filter_by(merchantId=merchantId, modifierGroupId=modifierGroupId).all()
+        return Modifier.query.filter_by(merchantId=merchantId, modifierGroupId=modifierGroupId, clientId=clientId).all()
 
     @staticmethod
-    def insertOrUpdateModifier(modifierData, merchantId):
-        modifier = Modifier.query.filter_by(modifierId=modifierData['id']).first()
+    def insertOrUpdateModifier(modifierData, merchantId, clientId):
+        modifier = Modifier.query.filter_by(modifierId=modifierData['id'], merchantId=merchantId, clientId=clientId).first()
         modifiedTime = datetime.fromtimestamp(modifierData.get('modifiedTime', datetime.now().timestamp() * 1000) / 1000.0)
 
         if modifier:
             # Update existing modifier
+            if modifier.clientId != clientId:
+                raise ValueError("Modifier does not belong to the specified client")
             modifier.name = modifierData['name']
             modifier.available = modifierData.get('available', modifier.available)
             modifier.price = modifierData['price']
@@ -198,12 +212,13 @@ class SupabaseService:
             modifier = Modifier(
                 modifierId=modifierData['id'],
                 merchantId=merchantId,
+                clientId=clientId,
                 name=modifierData['name'],
                 available=modifierData.get('available', True),
                 price=modifierData['price'],
                 modifiedTime=modifiedTime,
                 modifierGroupId=modifierData['modifierGroup']['id'],
-                deleted=modifierData.get('deleted', False)
+                deleted=modifierData.get('deleted', False),
             )
             db.session.add(modifier)
 
@@ -324,7 +339,7 @@ class SupabaseService:
         return CategoryImage.query.filter_by(categoryId=category_id).first()
 
     @staticmethod
-    def get_item_by_id(merchant_id, item_id):
+    def getItemById(merchant_id, item_id, client_id):
         """
         Retrieve a specific item for a given merchant_id and item_id.
         
@@ -332,10 +347,11 @@ class SupabaseService:
         :param item_id: The ID of the item
         :return: An Item object or None if not found
         """
-        return Item.query.filter_by(merchant_id=merchant_id, item_id=item_id).first()
+        print("merchant_id", merchant_id)
+        return Item.query.filter_by(merchant_id=merchant_id, item_id=item_id, clientId=client_id).first()
 
     @staticmethod
-    def insertOrUpdateItemImages(itemId, imageUrls):
+    def insertOrUpdateItemImages(itemId, imageUrls, clientId):
         """
         Insert new item images or update existing ones in the itemImages table.
 
@@ -344,7 +360,7 @@ class SupabaseService:
         :return: List of created or updated ItemImage objects
         """
         try:
-            existingImages = ItemImage.query.filter_by(itemId=itemId).all()
+            existingImages = ItemImage.query.filter_by(itemId=itemId, clientId=clientId).all()
             
             # Delete existing images not in the new list
             for existingImage in existingImages:
@@ -362,7 +378,8 @@ class SupabaseService:
                     # Insert new image
                     newImage = ItemImage(
                         itemId=itemId,
-                        imageUrl=url
+                        imageUrl=url,
+                        clientId=clientId
                     )
                     db.session.add(newImage)
                     updatedImages.append(newImage)
@@ -375,7 +392,7 @@ class SupabaseService:
             raise
     
     @staticmethod
-    def insertItemImage(item_id, image_url):
+    def insertItemImage(itemId, imageUrl, clientId):
         """
         Insert a new item image or update an existing one in the itemImages table.
         Raises an error if there are already 6 or more images for the item.
@@ -387,15 +404,15 @@ class SupabaseService:
         """
         try:
             # Count existing images for the item
-            existing_image_count = ItemImage.query.filter_by(itemId=item_id).count()
+            existing_image_count = ItemImage.query.filter_by(itemId=itemId).count()
             
             if existing_image_count >= 6:
-                raise ValueError(f"Item {item_id} already has 6 or more images. Cannot add more.")
+                raise ValueError(f"Item {itemId} already has 6 or more images. Cannot add more.")
             
             # Insert new image
             newItemImage = ItemImage(
-                imageURL=image_url,
-                itemId=item_id
+                imageURL=imageUrl,
+                itemId=itemId
             )
             db.session.add(newItemImage)
             db.session.commit()
@@ -406,14 +423,14 @@ class SupabaseService:
             raise
 
     @staticmethod
-    def getItemImagesByItemId(itemId):
+    def getItemImagesByItemId(itemId, clientId):
         """
         Retrieve all images for a given item ID.
         
         :param itemId: The ID of the item
         :return: A list of ItemImage objects or an empty list if not found
         """
-        return ItemImage.query.filter_by(itemId=itemId).all()
+        return ItemImage.query.filter_by(itemId=itemId, clientId=clientId).all()
 
     @staticmethod
     def deleteItemImage(itemImageId):
@@ -438,7 +455,7 @@ class SupabaseService:
             raise
 
     @staticmethod
-    def getModifiersByIds(id_list_string):
+    def getModifiersByIds(idListString, clientId):
         """
         Retrieve all modifiers whose IDs are in the given comma-separated string of IDs.
 
@@ -446,15 +463,15 @@ class SupabaseService:
         :return: A list of Modifier objects
         """
         # Split the string into a list of IDs and strip any whitespace
-        id_list = [id.strip() for id in id_list_string.split(',') if id.strip()]
+        idList = [id.strip() for id in idListString.split(',') if id.strip()]
 
         # Query the database for modifiers with IDs in the list
-        modifiers = Modifier.query.filter(Modifier.modifierId.in_(id_list)).all()
+        modifiers = Modifier.query.filter(Modifier.modifierId.in_(idList), Modifier.clientId == clientId).all()
 
         return modifiers
     
     @staticmethod
-    def getModifierById(merchantId,modifierId ):
+    def getModifierById(merchantId, modifierId, clientId):
         """
         Retrieve a single modifier based on modifierId and merchantId
 
@@ -462,23 +479,81 @@ class SupabaseService:
         :param merchantId: A string representing the merchant ID
         :return: A Modifier object or None if not found
         """
-        return Modifier.query.filter_by(modifierId=modifierId, merchantId=merchantId).first()
+        return Modifier.query.filter_by(modifierId=modifierId, merchantId=merchantId, clientId=clientId).first()
 
     @staticmethod
-    def insertModifierImage(modifierId, imageUrl):
-        modifierImage = ModifierImage(imageUrl=imageUrl, modifierId=modifierId)
+    def insertModifierImage(modifierId, imageUrl, clientId):
+        modifierImage = ModifierImage(imageUrl=imageUrl, modifierId=modifierId, clientId=clientId)
         db.session.add(modifierImage)
         db.session.commit()
         return modifierImage
 
     @staticmethod
-    def getModifierImageByModifierId(modifierId):
-        return ModifierImage.query.filter_by(modifierId=modifierId).first()
+    def getModifierImageByModifierId(modifierId, clientId):
+        return ModifierImage.query.filter_by(modifierId=modifierId, clientId=clientId).first()
 
     @staticmethod
-    def updateModifierImage(modifierId, imageUrl):
-        modifierImage = ModifierImage.query.filter_by(modifierId=modifierId).first()
+    def updateModifierImage(modifierId, imageUrl, clientId):
+        modifierImage = ModifierImage.query.filter_by(modifierId=modifierId, clientId=clientId).first()
         if modifierImage:
+            if modifierImage.clientId != clientId:
+                raise ValueError("ModifierImage does not belong to the specified client")
             modifierImage.imageUrl = imageUrl
             db.session.commit()
         return modifierImage
+
+    @staticmethod
+    def insertClient(restaurantName):
+        """
+        Insert a new client into the client table.
+
+        :param restaurantName: The name of the restaurant
+        :return: The created Client object
+        """
+        try:
+            newClient = Client(
+                name=restaurantName
+            )
+            db.session.add(newClient)
+            db.session.commit()
+            return newClient
+        except Exception as e:
+            print(f"An error occurred while inserting client: {str(e)}")
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def insertUser(clientId, firstName, lastName, isAdmin, uid):
+        try:
+            newUser = User(
+                clientId=clientId,
+                firstName=firstName,
+                lastName=lastName,
+                isAdmin=isAdmin,
+                uid=uid
+            )
+            db.session.add(newUser)
+            db.session.commit()
+            return newUser
+        except Exception as e:
+            print("Error inserting user:", str(e))
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def getUser(userId):
+        try:
+            user = User.query.get(userId)
+            return user
+        except Exception as e:
+            print("Error getting user:", str(e))
+            raise
+
+    @staticmethod
+    def getUserByUid(uid):
+        try:
+            user = User.query.filter_by(uid=uid).first()
+            return user
+        except Exception as e:
+            print("Error getting user by UID:", str(e))
+            raise

@@ -90,7 +90,7 @@ export const columns = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Edit dish</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/dishes/merchant/${dish.merchantId}/dishes/${dish.item_id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`/dishes/merchant/${dish.merchantId}/dishes/${dish.itemId}`)}>
               <Eye className="mr-2 h-4 w-4" />
               View dish details
             </DropdownMenuItem>

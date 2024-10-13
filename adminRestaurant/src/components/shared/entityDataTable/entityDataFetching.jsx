@@ -8,15 +8,25 @@ export function useDataFetching(endpoint, queryKey) {
   const { data, isLoading, error } = useQuery({
     queryKey: [endpoint],
     queryFn: async () => {
+      const auth = getAuth()
+      const user = auth.currentUser
+      if (!user) {
+        throw new Error('User not authenticated')
+      }
+      const token = await user.getIdToken()
       const merchantId = '6JDE8MZSA6FJ1' // Replace with actual merchant ID
-      const response = await axios.get(`http://127.0.0.1:4000/${endpoint}/${merchantId}`)
-      console.log('API response:', response.data) // Add this line
-      // Return an empty array if the data is undefined
+      const response = await axios.get(`http://127.0.0.1:4000/${endpoint}/${merchantId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+          
+        }
+      })
+      console.log('API response:', response.data)
       return response.data[endpoint] || []
     },
   })
 
-  console.log('Fetched data:', data) // Add this line
+  console.log('Fetched data:', data)
 
   const syncMutation = useMutation({
     mutationFn: async () => {

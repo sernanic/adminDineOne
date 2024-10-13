@@ -33,6 +33,16 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+// Add this new function at the top of the file, outside the component
+const getAuthToken = async () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+  return user.getIdToken();
+};
+
 function DishDetails() {
   const { merchantId, itemId } = useParams();
   const [dishData, setDishData] = useState(null);
@@ -45,10 +55,15 @@ function DishDetails() {
   useEffect(() => {
     const fetchDishDetails = async () => {
       try {
+        const token = await getAuthToken();
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+        };
+
         const [dishResponse, imagesResponse, modifierGroupsResponse] = await Promise.all([
-          axios.get(`http://127.0.0.1:4000/item/${merchantId}/${itemId}`),
-          axios.get(`http://127.0.0.1:4000/item/${itemId}/images`),
-          axios.get(`http://127.0.0.1:4000/item/${merchantId}/${itemId}/modifierGroups`)
+          axios.get(`http://127.0.0.1:4000/item/${merchantId}/${itemId}`, { headers }),
+          axios.get(`http://127.0.0.1:4000/item/${itemId}/images`, { headers }),
+          axios.get(`http://127.0.0.1:4000/item/${merchantId}/${itemId}/modifierGroups`, { headers })
         ]);
 
         console.log("dishResponse", dishResponse);
@@ -72,14 +87,7 @@ function DishDetails() {
 
   const addDishImage = async (imageURL) => {
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
-      const token = await user.getIdToken();
-
+      const token = await getAuthToken();
       const response = await axios.post('http://127.0.0.1:4000/item/image', {
         itemId: itemId,
         imageURL: imageURL
@@ -103,14 +111,7 @@ function DishDetails() {
 
   const handleDeleteImage = async (imageId) => {
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
-
-      const token = await user.getIdToken();
-
+      const token = await getAuthToken();
       await axios.delete(`http://127.0.0.1:4000/item/image/${imageId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,8 +1,9 @@
 from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
-from app.utils.auth_middleware import firebase_auth_required
+from app.utils.auth_middleware import firebaseAuthRequired
 from app.config.firebase_config import initialize_firebase
+
 
 # Initialize Firebase
 initialize_firebase()
@@ -10,72 +11,87 @@ initialize_firebase()
 item_bp = Blueprint('item_bp', __name__)
 
 @item_bp.route('/sync/items', methods=['POST'])
-@firebase_auth_required
-def sync_items():
+@firebaseAuthRequired
+def syncItems():
+    currentUser = request.currentUser
+    clientId = request.clientId
     try:
-        merchant_id = "6JDE8MZSA6FJ1"
-        items = CloverService.fetchItems(merchant_id)
-        for item_data in items:
-            SupabaseService.insert_or_update_item(item_data,merchant_id)
+        merchantId = "6JDE8MZSA6FJ1"
+        items = CloverService.fetchItems(merchantId)
+        for itemData in items:
+            SupabaseService.insertOrUpdateItem(itemData, merchantId, clientId)
 
         return jsonify({"message": "Items synced successfully"}), 200
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 @item_bp.route('/items/<merchant_id>', methods=['GET'])
-def get_items(merchant_id):
+@firebaseAuthRequired
+def getItems(merchant_id):
+    currentUser = request.currentUser
+    clientId = request.clientId
+    print("clientId", clientId)
     try:
-        items = SupabaseService.get_items_by_merchant_id(merchant_id)
+        items = SupabaseService.getItemsByMerchantId(merchant_id, clientId)
         # Convert items to a list of dictionaries
-        items_data = [{
-            'item_id': item.item_id,
+        itemsData = [{
+            'itemId': item.item_id,
             'name': item.name,
             'price': item.price,
             'hidden': item.hidden,
             'available': item.available,
-            'auto_manage': item.auto_manage,
-            'price_type': item.price_type,
-            'default_tax_rates': item.default_tax_rates,
+            'autoManage': item.auto_manage,
+            'priceType': item.price_type,
+            'defaultTaxRates': item.default_tax_rates,
             'cost': item.cost,
-            'is_revenue': item.is_revenue,
-            'modified_time': item.modified_time.isoformat() if item.modified_time else None,
+            'isRevenue': item.is_revenue,
+            'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
             'deleted': item.deleted,
             'merchantId': item.merchant_id
         } for item in items]
 
-        return jsonify({"items": items_data}), 200
+        return jsonify({"items": itemsData}), 200
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 @item_bp.route('/item/<merchant_id>/<item_id>', methods=['GET'])
-def get_item(merchant_id, item_id):
+@firebaseAuthRequired
+def getItem(merchant_id, item_id):
+    currentUser = request.currentUser
+    clientId = request.clientId
     try:
-        item = SupabaseService.get_item_by_id(merchant_id, item_id)
-        
+        item = SupabaseService.getItemById(merchant_id, item_id, clientId)
+        print("item", item)
         if item:
-            item_data = {
-                'item_id': item.item_id,
+            itemData = {
+                'itemId': item.item_id,
                 'name': item.name,
                 'price': item.price,
                 'hidden': item.hidden,
                 'available': item.available,
-                'auto_manage': item.auto_manage,
-                'price_type': item.price_type,
-                'default_tax_rates': item.default_tax_rates,
+                'autoManage': item.auto_manage,
+                'priceType': item.price_type,
+                'defaultTaxRates': item.default_tax_rates,
                 'cost': item.cost,
-                'is_revenue': item.is_revenue,
-                'modified_time': item.modified_time.isoformat() if item.modified_time else None,
-                'deleted': item.deleted
+                'isRevenue': item.is_revenue,
+                'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
+                'deleted': item.deleted,
+                'merchantId': item.merchant_id
             }
-            return jsonify({"item": item_data}), 200
+            return jsonify({"item": itemData}), 200
         else:
             return jsonify({"error": "Item not found"}), 404
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 @item_bp.route('/item/<item_id>/images', methods=['POST'])
-@firebase_auth_required
+@firebaseAuthRequired
 def addItemImages():
+    currentUser = request.currentUser
+    clientId = request.clientId
     try:
         data = request.json
         itemId = data.get('itemId')
@@ -87,7 +103,7 @@ def addItemImages():
         if len(imageUrls) > 6:
             return jsonify({"error": "Maximum 6 images allowed per item"}), 400
 
-        itemImages = SupabaseService.insertItemImage(itemId, imageUrls)
+        itemImages = SupabaseService.insertItemImage(itemId, imageUrls, clientId)
 
         return jsonify({
             "message": "Item images added successfully",
@@ -100,10 +116,13 @@ def addItemImages():
         return jsonify({"error": str(e)}), 500
 
 @item_bp.route('/item/<item_id>/images', methods=['GET'])
+@firebaseAuthRequired
 def getItemImages(item_id):
+    currentUser = request.currentUser
+    clientId = request.clientId
     try:
-        itemImages = SupabaseService.getItemImagesByItemId(item_id)
-
+        itemImages = SupabaseService.getItemImagesByItemId(item_id, clientId)
+        print("itemImages", itemImages)
         if itemImages:
             imagesData = [
                 {
@@ -119,38 +138,41 @@ def getItemImages(item_id):
         return jsonify({"error": str(e)}), 500
 
 @item_bp.route('/item/image', methods=['POST'])
-@firebase_auth_required
-def add_item_image():
+@firebaseAuthRequired
+def addItemImage():
+    currentUser = request.currentUser
+    clientId = request.clientId
     try:
         data = request.json
-        item_id = data.get('itemId')
-        image_url = data.get('imageURL')
+        itemId = data.get('itemId')
+        imageUrl = data.get('imageURL')
 
-        if not item_id or not image_url:
+        if not itemId or not imageUrl:
             return jsonify({"error": "Both itemId and imageURL are required"}), 400
 
-        item_image = SupabaseService.insertItemImage(item_id, image_url)
+        itemImage = SupabaseService.insertItemImage(itemId, imageUrl, clientId)
 
         return jsonify({
             "message": "Item image added successfully",
             "itemImage": {
-                "id": item_image.id,
-                "itemId": item_image.itemId,
-                "imageURL": item_image.imageURL
+                "id": itemImage.id,
+                "itemId": itemImage.itemId,
+                "imageURL": itemImage.imageURL
             }
         }), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @item_bp.route('/item/image/<int:image_id>', methods=['DELETE'])
-@firebase_auth_required
-def delete_item_image(image_id):
+@firebaseAuthRequired
+def deleteItemImage(imageId):
+    currentUser = request.currentUser
+    clientId = request.clientId
     try:
-        result = SupabaseService.deleteItemImage(image_id)
+        result = SupabaseService.deleteItemImage(imageId, clientId)
         if result:
             return jsonify({"message": "Item image deleted successfully"}), 200
         else:
             return jsonify({"error": "Image not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-

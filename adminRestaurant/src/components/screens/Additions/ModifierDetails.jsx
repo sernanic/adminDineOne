@@ -16,9 +16,24 @@ const ModifierDetails = () => {
 
   const fetchModifierDetails = useCallback(async () => {
     try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+      const token = await user.getIdToken();
+
       const [modifierResponse, imageResponse] = await Promise.all([
-        axios.get(`http://127.0.0.1:4000/merchant/${merchantId}/modifier/${modifierId}`),
-        axios.get(`http://127.0.0.1:4000/modifier/${modifierId}/image`)
+        axios.get(`http://127.0.0.1:4000/merchant/${merchantId}/modifier/${modifierId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }),
+        axios.get(`http://127.0.0.1:4000/modifier/${modifierId}/image`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
       ]);
       setModifier(modifierResponse.data.modifier);
       setModifierImage(imageResponse.data.modifierImage);

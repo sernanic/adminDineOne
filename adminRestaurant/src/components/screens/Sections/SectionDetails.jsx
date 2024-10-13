@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 import ImageUploader from '../../shared/imageUploader';
-import { Pencil, Trash2 } from 'lucide-react'; // Import the icons
+import { Pencil, Trash2 } from 'lucide-react';
 import { Card, CardHeader, CardBody, CardFooter, Image, Button } from "@nextui-org/react";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 
@@ -26,10 +26,23 @@ export default function SectionDetails() {
   useEffect(() => {
     const fetchSectionDetails = async () => {
       try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const token = await user.getIdToken();
+
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
         const [sectionResponse, itemsResponse, imageResponse] = await Promise.all([
-          axios.get(`http://127.0.0.1:4000/category/${merchantId}/${categoryId}`),
-          axios.get(`http://127.0.0.1:4000/category/${merchantId}/${categoryId}/items`),
-          axios.get(`http://127.0.0.1:4000/category/${categoryId}/image`)
+          axios.get(`http://127.0.0.1:4000/category/${merchantId}/${categoryId}`, { headers }),
+          axios.get(`http://127.0.0.1:4000/category/${merchantId}/${categoryId}/items`, { headers }),
+          axios.get(`http://127.0.0.1:4000/category/${categoryId}/image`, { headers })
         ]);
 
         setSectionData({
@@ -76,9 +89,8 @@ export default function SectionDetails() {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        // Add this to see more detailed error information
         validateStatus: function (status) {
-          return status < 500; // Resolve only if the status code is less than 500
+          return status < 500;
         }
       });
 
@@ -122,7 +134,8 @@ export default function SectionDetails() {
       await axios.delete(`http://127.0.0.1:4000/category/${categoryId}/image`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-        },
+          'Content-Type': 'application/json'
+        }
       });
 
       setCategoryImage(null);

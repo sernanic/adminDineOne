@@ -14,8 +14,9 @@ class Modifier(db.Model):
     modifiedTime = db.Column(TIMESTAMP(timezone=True), nullable=False)
     modifierGroupId = db.Column(TEXT, nullable=False)
     deleted = db.Column(BOOLEAN, nullable=False, default=False)
+    clientId = db.Column(BIGINT, nullable=False)
 
-    def __init__(self, modifierId, merchantId, name, available, price, modifiedTime, modifierGroupId, deleted):
+    def __init__(self, modifierId, merchantId, name, available, price, modifiedTime, modifierGroupId, deleted, clientId):
         self.modifierId = modifierId
         self.merchantId = merchantId
         self.name = name
@@ -25,6 +26,7 @@ class Modifier(db.Model):
         self.modifiedTime = datetime.fromtimestamp(modifiedTime / 1000.0) if isinstance(modifiedTime, (int, float)) else modifiedTime
         self.modifierGroupId = modifierGroupId
         self.deleted = deleted
+        self.clientId = clientId
 
     def __repr__(self):
         return f'<Modifier {self.name}>'

@@ -1,6 +1,7 @@
 from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
+from app.utils.auth_middleware import firebaseAuthRequired
 
 itemGroupBp = Blueprint('itemGroupBp', __name__)
 
@@ -18,9 +19,10 @@ def syncItemGroups():
         return jsonify({"error": str(e)}), 500
 
 @itemGroupBp.route('/itemGroups/<merchantId>', methods=['GET'])
-def getItemGroups(merchantId):
+@firebaseAuthRequired
+def getItemGroups(merchantId, currentUser, clientId):
     try:
-        itemGroups = SupabaseService.getItemGroupsByMerchantId(merchantId)
+        itemGroups = SupabaseService.getItemGroupsByMerchantId(merchantId, clientId)
         
         # Convert item groups to a list of dictionaries
         itemGroupsData = [{
@@ -29,6 +31,7 @@ def getItemGroups(merchantId):
             'sortOrder': group.sortOrder,
             'deleted': group.deleted,
             'modifiedTime': group.modifiedTime.isoformat() if group.modifiedTime else None,
+            'clientId': group.clientId
         } for group in itemGroups]
 
         return jsonify({"itemGroups": itemGroupsData}), 200

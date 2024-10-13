@@ -11,14 +11,15 @@ class ModifierGroup(db.Model):
     showByDefault = db.Column(BOOLEAN, nullable=False, default=False)
     sortOrder = db.Column(INTEGER, nullable=False, default=0)
     deleted = db.Column(BOOLEAN, nullable=False, default=False)
+    clientId = db.Column(BIGINT, nullable=False)
 
-    def __init__(self, modifierGroupId, merchantId, name, showByDefault, sortOrder, deleted):
+    def __init__(self, modifierGroupId, merchantId, name, showByDefault, sortOrder, deleted, clientId):
         self.modifierGroupId = modifierGroupId
         self.merchantId = merchantId
         self.name = name
         self.showByDefault = showByDefault
         self.sortOrder = sortOrder
         self.deleted = deleted
-
+        self.clientId = clientId
     def __repr__(self):
         return f'<ModifierGroup {self.name}>'

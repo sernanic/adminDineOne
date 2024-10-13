@@ -19,8 +19,10 @@ class Item(db.Model):
     is_revenue = db.Column(BOOLEAN, nullable=False, default=False)
     modified_time = db.Column(TIMESTAMP(timezone=True), nullable=False)
     deleted = db.Column(BOOLEAN, nullable=False, default=False)
+    clientId = db.Column(BIGINT, nullable=False)
+    
 
-    def __init__(self, item_id, merchant_id, hidden, available, auto_manage, name, price, price_type, default_tax_rates, cost, is_revenue, modified_time, deleted):
+    def __init__(self, item_id, merchant_id, hidden, available, auto_manage, name, price, price_type, default_tax_rates, cost, is_revenue, modified_time, deleted, clientId):
         self.item_id = item_id
         self.merchant_id = merchant_id  # New parameter
         self.hidden = hidden
@@ -35,6 +37,6 @@ class Item(db.Model):
         # Convert bigint to datetime
         self.modified_time = datetime.fromtimestamp(modified_time / 1000.0) if isinstance(modified_time, (int, float)) else modified_time
         self.deleted = deleted
-
+        self.clientId = clientId
     def __repr__(self):
         return f'<Item {self.name}>'

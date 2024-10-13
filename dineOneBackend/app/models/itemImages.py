@@ -7,10 +7,12 @@ class ItemImage(db.Model):
     id = db.Column(BIGINT, primary_key=True, autoincrement=True)
     itemId = db.Column(TEXT, nullable=False)
     imageURL = db.Column(TEXT, nullable=False)
+    clientId = db.Column(BIGINT, nullable=False)
 
-    def __init__(self, itemId, imageURL):
+    def __init__(self, itemId, imageURL, clientId):
         self.itemId = itemId
         self.imageURL = imageURL
+        self.clientId = clientId
 
     def __repr__(self):
         return f"<ItemImage {self.id}>"
