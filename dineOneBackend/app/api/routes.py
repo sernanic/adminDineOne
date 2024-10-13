@@ -7,6 +7,8 @@ from app.api.handlers.modifier_handler import modifierBp
 from app.api.handlers.integration_handler import integrationBp
 from app.api.handlers.client_handler import clientBp
 from app.api.handlers.user_handler import userBp
+from app.api.handlers.merchant_handler import merchantBp
+
 api_bp = Blueprint('api_bp', __name__)
 
 # Register the item routes
@@ -17,3 +19,4 @@ api_bp.register_blueprint(modifierBp)
 api_bp.register_blueprint(integrationBp)
 api_bp.register_blueprint(clientBp)
 api_bp.register_blueprint(userBp)
+api_bp.register_blueprint(merchantBp)

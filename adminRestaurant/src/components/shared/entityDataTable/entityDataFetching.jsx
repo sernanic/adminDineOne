@@ -1,29 +1,33 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { getAuth } from 'firebase/auth'
+import useMerchantStore from '../../../stores/merchantStore'
 
 export function useDataFetching(endpoint, queryKey) {
   const queryClient = useQueryClient()
+  const selectedMerchantId = useMerchantStore(state => state.selectedMerchantId)
 
   const { data, isLoading, error } = useQuery({
-    queryKey: [endpoint],
+    queryKey: [endpoint, selectedMerchantId],
     queryFn: async () => {
       const auth = getAuth()
       const user = auth.currentUser
       if (!user) {
         throw new Error('User not authenticated')
       }
+      if (!selectedMerchantId) {
+        throw new Error('No merchant selected')
+      }
       const token = await user.getIdToken()
-      const merchantId = '6JDE8MZSA6FJ1' // Replace with actual merchant ID
-      const response = await axios.get(`http://127.0.0.1:4000/${endpoint}/${merchantId}`, {
+      const response = await axios.get(`http://127.0.0.1:4000/${endpoint}/${selectedMerchantId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
-          
         }
       })
       console.log('API response:', response.data)
       return response.data[endpoint] || []
     },
+    enabled: !!selectedMerchantId,
   })
 
   console.log('Fetched data:', data)

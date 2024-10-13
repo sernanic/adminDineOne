@@ -12,6 +12,7 @@ from app.models.modifier_group import ModifierGroup
 from app.models.modifierImages import ModifierImage
 from app.models.client import Client
 from app.models.user import User
+from app.models.merchant import Merchant
 
 class SupabaseService:
 
@@ -556,4 +557,36 @@ class SupabaseService:
             return user
         except Exception as e:
             print("Error getting user by UID:", str(e))
+            raise
+    
+    @staticmethod
+    def getMerchants(clientId):
+        """
+        Retrieve all merchants for a given clientId from the merchants table.
+        
+        :param clientId: The ID of the client
+        :return: A list of Merchant objects
+        """
+        try:
+            merchants = Merchant.query.filter_by(clientId=clientId).all()
+            return merchants
+        except Exception as e:
+            print(f"An error occurred while retrieving merchants for clientId {clientId}: {str(e)}")
+            raise
+
+    @staticmethod
+    def addMerchant(merchant):
+        """
+        Add a new merchant to the database.
+
+        :param merchant: A Merchant object containing the merchant details
+        :return: The added Merchant object with updated information (e.g., assigned ID)
+        """
+        try:
+            db.session.add(merchant)
+            db.session.commit()
+            return merchant
+        except Exception as e:
+            print(f"An error occurred while adding merchant: {str(e)}")
+            db.session.rollback()
             raise

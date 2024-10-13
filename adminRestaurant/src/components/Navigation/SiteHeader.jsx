@@ -2,12 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import { IoNotificationsOutline, IoSettingsOutline, IoPersonOutline, IoLogOutOutline } from 'react-icons/io5';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getAuth, signOut } from 'firebase/auth';
+import { Select, SelectItem } from '@nextui-org/react';
+import axios from 'axios';
+import useMerchantStore from '../../stores/merchantStore';
 
 export default function SiteHeader() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { selectedMerchantId, setSelectedMerchantId } = useMerchantStore();
+  console.log("selectedMerchantId",selectedMerchantId)
+  const [merchants, setMerchants] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const getHeaderTitle = () => {
     // ... logic to determine header title based on location.pathname
@@ -73,6 +80,45 @@ export default function SiteHeader() {
     };
   }, []);
 
+  useEffect(() => {
+    fetchMerchants();
+  }, []);
+
+  const fetchMerchants = async () => {
+    setIsLoading(true);
+    try {
+      const auth = getAuth();
+      const idToken = await auth.currentUser.getIdToken();
+      const response = await axios.get('http://127.0.0.1:4000/merchants', {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      });
+      setMerchants(response.data.merchants);
+      if (response.data.merchants.length > 0) {
+        const storedMerchantId = localStorage.getItem('selectedMerchantId');
+        if (storedMerchantId && response.data.merchants.some(m => m.merchantId === storedMerchantId)) {
+          console.log("hello")
+          setSelectedMerchantId(storedMerchantId);
+          console.log("selectedMerchantId",selectedMerchantId)
+        } else {
+          console.log("nope")
+          setSelectedMerchantId(response.data.merchants[0].merchantId);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching merchants:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMerchantChange = (e) => {
+    const newMerchantId = e.target.value;
+    setSelectedMerchantId(newMerchantId);
+    localStorage.setItem('selectedMerchantId', newMerchantId);
+  };
+
   return (
     <header className="w-full border-b bg-white">
       <div className="flex h-14 items-center px-4 justify-between">
@@ -80,6 +126,20 @@ export default function SiteHeader() {
           <h1 className="text-xl font-semibold">{getHeaderTitle()}</h1>
         </div>
         <div className="flex items-center space-x-6">
+          <Select
+            value={selectedMerchantId}
+            onChange={handleMerchantChange}
+            className="min-w-[200px]"
+            selectedKeys={selectedMerchantId ? [selectedMerchantId] : []}
+            labelPlacement="outside"
+            isLoading={isLoading}
+          >
+            {merchants.map((merchant) => (
+              <SelectItem key={merchant.merchantId} value={merchant.merchantId}>
+                {merchant.name}
+              </SelectItem>
+            ))}
+          </Select>
           <button className="text-gray-600 hover:text-gray-900">
             <IoSettingsOutline size={24} />
           </button>

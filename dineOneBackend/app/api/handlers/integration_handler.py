@@ -40,10 +40,11 @@ def getIntegration(clientId):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@integrationBp.route('/clover/integration/<clientId>', methods=['GET'])
+@integrationBp.route('/clover/integration/', methods=['GET'])
 @firebaseAuthRequired
-def getCloverIntegration(clientId):
+def getCloverIntegration():
     try:
+        clientId = request.clientId
         integration = SupabaseService.getCloverIntegrationByClientId(clientId)
         
         if integration:
