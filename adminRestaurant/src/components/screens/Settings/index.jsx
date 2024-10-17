@@ -5,6 +5,7 @@ import IntegrationsSettings from './IntegrationsSettings';
 import SupportSettings from './SupportSettings';
 import OrganizationsSettings from './OrganizationsSettings';
 import AdvancedSettings from './AdvancedSettings';
+import UsersSettings from './UsersSettings';
 // import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Tabs, Tab } from "@nextui-org/react";
 
@@ -30,6 +31,8 @@ const Settings = () => {
                 return <OrganizationsSettings />;
             case 'advanced':
                 return <AdvancedSettings />;
+            case 'users':
+                return <UsersSettings />;
             default:
                 return <GeneralSettings />;
         }
@@ -51,15 +54,14 @@ const Settings = () => {
                         { name: 'Support', id: 'support' },
                         { name: 'Organizations', id: 'organizations' },
                         { name: 'Advanced', id: 'advanced' },
+                        { name: 'Users', id: 'users' },
                     ].map((item) => (
                         <Tab key={item.id} title={item.name} />
-
                     ))}
                 </Tabs>
             </div>
             <div className="flex gap-10">
                 {renderTabContent()}
-
             </div>
         </div>
     );

@@ -30,7 +30,6 @@ export function useDataFetching(endpoint, queryKey) {
     enabled: !!selectedMerchantId,
   })
 
-  console.log('Fetched data:', data)
 
   const syncMutation = useMutation({
     mutationFn: async () => {

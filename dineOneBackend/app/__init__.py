@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS  # Add this import
 from dotenv import load_dotenv
 import os
-
+from app.config.firebase_config import initialize_firebase
 # Load environment variables from .env file
 load_dotenv()
 
@@ -14,6 +14,9 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
+
+    # Initialize Firebase
+    initialize_firebase()
 
     with app.app_context():
         from app.api.routes import api_bp

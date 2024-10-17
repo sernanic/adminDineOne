@@ -2,11 +2,9 @@ from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
 from app.utils.auth_middleware import firebaseAuthRequired
-from app.config.firebase_config import initialize_firebase
 
 
-# Initialize Firebase
-initialize_firebase()
+
 
 item_bp = Blueprint('item_bp', __name__)
 

@@ -17,7 +17,7 @@ def firebaseAuthRequired(f):
             decodedToken = auth.verify_id_token(idToken)
             # Get the UID from the decoded token
             uid = decodedToken['uid']
-            
+            print("uid", uid)
             # Fetch the user from Supabase using the UID
             from app.services.supabase_service import SupabaseService
             user = SupabaseService.getUserByUid(uid)
@@ -32,4 +32,12 @@ def firebaseAuthRequired(f):
         except Exception as e:
             print("Error verifying token:", str(e))
             return jsonify({"error": "Invalid token"}), 401
+    return decoratedFunction
+
+def adminRequired(f):
+    @wraps(f)
+    def decoratedFunction(*args, **kwargs):
+        if not request.currentUser or not request.currentUser.isAdmin:
+            return jsonify({"error": "Admin access required"}), 403
+        return f(*args, **kwargs)
     return decoratedFunction

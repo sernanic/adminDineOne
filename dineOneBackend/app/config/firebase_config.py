@@ -17,8 +17,6 @@ def initialize_firebase():
     
     firebase_admin.initialize_app(cred)
 
-# Call this function when your app starts
-# initialize_firebase()
 
 
 

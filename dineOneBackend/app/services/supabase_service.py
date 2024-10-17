@@ -413,7 +413,8 @@ class SupabaseService:
             # Insert new image
             newItemImage = ItemImage(
                 imageURL=imageUrl,
-                itemId=itemId
+                itemId=itemId,
+                clientId=clientId
             )
             db.session.add(newItemImage)
             db.session.commit()
@@ -526,11 +527,14 @@ class SupabaseService:
     @staticmethod
     def insertUser(clientId, firstName, lastName, isAdmin, uid):
         try:
+            
+            isAdminBool = isAdmin == 'on'
+            
             newUser = User(
                 clientId=clientId,
                 firstName=firstName,
                 lastName=lastName,
-                isAdmin=isAdmin,
+                isAdmin=isAdminBool,  # Use the converted boolean value
                 uid=uid
             )
             db.session.add(newUser)
@@ -589,4 +593,13 @@ class SupabaseService:
         except Exception as e:
             print(f"An error occurred while adding merchant: {str(e)}")
             db.session.rollback()
+            raise
+
+    @staticmethod
+    def getUsers(clientId):
+        try:
+            users = User.query.filter_by(clientId=clientId).all()
+            return users
+        except Exception as e:
+            print(f"Error getting users for clientId {clientId}:", str(e))
             raise
