@@ -29,12 +29,14 @@ const UsersSettings = () => {
         },
         enabled: !!selectedMerchantId,
     });
-
+    
     const columns = [
         { accessorKey: 'firstName', header: 'First Name' },
         { accessorKey: 'lastName', header: 'Last Name' },
         { accessorKey: 'uid', header: 'UID' },
-        { accessorKey: 'isAdmin', header: 'Is Admin', cell: ({ row }) => row.original.isAdmin },
+        { accessorKey: 'activationCode', header: 'Activation Code' },
+        { accessorKey: 'isActive', header: 'Active', cell: ({ row }) => row.original.isActive ? 'Yes' : 'No' },
+        { accessorKey: 'isAdmin', header: 'Is Admin', cell: ({ row }) => row.original.isAdmin ? 'Yes' : 'No' },
     ];
 
     const handleAddUser = () => {

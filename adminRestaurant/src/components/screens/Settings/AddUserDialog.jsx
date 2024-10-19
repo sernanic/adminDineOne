@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import {
     Dialog,
     DialogContent,
@@ -22,20 +22,16 @@ const AddUserDialog = ({ isOpen, onClose, onUserAdded }) => {
         mutationFn: async (userData) => {
             const auth = getAuth();
             const currentUser = auth.currentUser;
+            
             if (!currentUser) {
                 throw new Error('User not authenticated');
             }
 
-            // Create new Firebase user
-            const { user: newUser } = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
-            
-            // Add UID to userData
-            userData.uid = newUser.uid;
+            const idToken = await currentUser.getIdToken();
 
-            const token = await currentUser.getIdToken();
             return axios.post('http://127.0.0.1:4000/user/add', userData, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${idToken}`
                 }
             });
         },
@@ -85,18 +81,6 @@ const AddUserDialog = ({ isOpen, onClose, onUserAdded }) => {
                             {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="password" className="text-right">
-                                Password
-                            </Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                className="col-span-3"
-                                {...register("password", { required: "Password is required" })}
-                            />
-                            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="isAdmin" className="text-right">
                                 Is Admin
                             </Label>
@@ -104,24 +88,6 @@ const AddUserDialog = ({ isOpen, onClose, onUserAdded }) => {
                                 id="isAdmin"
                                 {...register("isAdmin")}
                             />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="email" className="text-right">
-                                Email
-                            </Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                className="col-span-3"
-                                {...register("email", { 
-                                    required: "Email is required",
-                                    pattern: {
-                                        value: /\S+@\S+\.\S+/,
-                                        message: "Invalid email address"
-                                    }
-                                })}
-                            />
-                            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                         </div>
                     </div>
                     <DialogFooter>

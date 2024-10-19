@@ -525,15 +525,18 @@ class SupabaseService:
             raise
 
     @staticmethod
-    def insertUser(clientId, firstName, lastName, isAdmin, uid):
+    def insertUser(clientId, firstName, lastName, email, activationCode, isActive, isAdmin, uid):
         try:
-            
+
             isAdminBool = isAdmin == 'on'
             
             newUser = User(
                 clientId=clientId,
                 firstName=firstName,
                 lastName=lastName,
+                email=email,
+                activationCode=activationCode,
+                isActive=isActive,
                 isAdmin=isAdminBool,  # Use the converted boolean value
                 uid=uid
             )
@@ -602,4 +605,26 @@ class SupabaseService:
             return users
         except Exception as e:
             print(f"Error getting users for clientId {clientId}:", str(e))
+            raise
+
+    @staticmethod
+    def getUserByActivationCode(activationCode):
+        try:
+            user = User.query.filter_by( activationCode=activationCode, isActive=False).first()
+            return user
+        except Exception as e:
+            print("Error getting user by activation code:", str(e))
+            raise
+
+    @staticmethod
+    def activateUser(user, email, uid):
+        try:
+            user.email = email
+            user.isActive = True
+            user.uid = uid
+            db.session.commit()
+            return user
+        except Exception as e:
+            print("Error activating user:", str(e))
+            db.session.rollback()
             raise

@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint, request
 from app.services.supabase_service import SupabaseService
 from app.utils.auth_middleware import firebaseAuthRequired,adminRequired
-from app.services.firebaseService import createAuthUser
+import random
 
 userBp = Blueprint('userBp', __name__)
 
@@ -15,16 +15,17 @@ def createUser():
         data = request.json
         firstName = data.get('firstName')
         lastName = data.get('lastName')
-        email = data.get('email')
-        password = data.get('password')
         isAdmin = data.get('isAdmin', False)
+        email = data.get('email')
+        activationCode = str(random.randint(100000, 999999))
+        isActive = False
         uid = data.get('uid')
-        print(firstName, lastName, email, password, isAdmin)
+        print(firstName, lastName, email, isAdmin)
 
-        if not firstName or not lastName or not email or not password or not uid:
+        if not firstName or not lastName:
             return jsonify({"error": "firstName, lastName, email, and password are required"}), 400
         
-        newUser = SupabaseService.insertUser(clientId, firstName, lastName, isAdmin, uid)
+        newUser = SupabaseService.insertUser(clientId, firstName, lastName, email, activationCode, isActive, isAdmin, uid)
 
         return jsonify({
             "message": "User created successfully",
@@ -56,4 +57,30 @@ def getAllUsers():
         return jsonify([user.toDict() for user in users]), 200
     except Exception as e:
         print("Error getting all users:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+@userBp.route('/user/activation', methods=['POST'])
+def activateUser():
+    try:
+        data = request.json
+        email = data.get('email')
+        activationCode = data.get('activationCode')
+        uid = data.get('uid') # this is the firebase uid
+
+        if not all([email, activationCode, uid]):
+            return jsonify({"error": "Missing required fields"}), 400
+
+        user = SupabaseService.getUserByActivationCode(activationCode)
+        
+        if not user:
+            return jsonify({"error": "Invalid activation code or user already activated"}), 404
+
+        activatedUser = SupabaseService.activateUser(user, email, uid)
+
+        return jsonify({
+            "message": "User activated successfully",
+            "user": activatedUser.toDict()
+        }), 200
+    except Exception as e:
+        print("Error activating user:", str(e))
         return jsonify({"error": str(e)}), 500
