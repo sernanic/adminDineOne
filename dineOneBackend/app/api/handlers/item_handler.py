@@ -15,13 +15,12 @@ def syncItems():
     clientId = request.clientId
     try:
         merchantId = "6JDE8MZSA6FJ1"
-        items = CloverService.fetchItems(merchantId)
+        items = CloverService.fetchItems(clientId, merchantId)
         for itemData in items:
             SupabaseService.insertOrUpdateItem(itemData, merchantId, clientId)
 
         return jsonify({"message": "Items synced successfully"}), 200
     except Exception as e:
-        print(e)
         return jsonify({"error": str(e)}), 500
 
 @item_bp.route('/items/<merchant_id>', methods=['GET'])
@@ -29,7 +28,6 @@ def syncItems():
 def getItems(merchant_id):
     currentUser = request.currentUser
     clientId = request.clientId
-    print("clientId", clientId)
     try:
         items = SupabaseService.getItemsByMerchantId(merchant_id, clientId)
         # Convert items to a list of dictionaries
@@ -51,7 +49,6 @@ def getItems(merchant_id):
 
         return jsonify({"items": itemsData}), 200
     except Exception as e:
-        print(e)
         return jsonify({"error": str(e)}), 500
 
 @item_bp.route('/item/<merchant_id>/<item_id>', methods=['GET'])
@@ -61,7 +58,6 @@ def getItem(merchant_id, item_id):
     clientId = request.clientId
     try:
         item = SupabaseService.getItemById(merchant_id, item_id, clientId)
-        print("item", item)
         if item:
             itemData = {
                 'itemId': item.item_id,
@@ -82,7 +78,6 @@ def getItem(merchant_id, item_id):
         else:
             return jsonify({"error": "Item not found"}), 404
     except Exception as e:
-        print(e)
         return jsonify({"error": str(e)}), 500
 
 @item_bp.route('/item/<item_id>/images', methods=['POST'])
@@ -120,7 +115,6 @@ def getItemImages(item_id):
     clientId = request.clientId
     try:
         itemImages = SupabaseService.getItemImagesByItemId(item_id, clientId)
-        print("itemImages", itemImages)
         if itemImages:
             imagesData = [
                 {

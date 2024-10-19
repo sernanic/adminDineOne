@@ -17,7 +17,6 @@ def firebaseAuthRequired(f):
             decodedToken = auth.verify_id_token(idToken)
             # Get the UID from the decoded token
             uid = decodedToken['uid']
-            print("uid", uid)
             # Fetch the user from Supabase using the UID
             from app.services.supabase_service import SupabaseService
             user = SupabaseService.getUserByUid(uid)

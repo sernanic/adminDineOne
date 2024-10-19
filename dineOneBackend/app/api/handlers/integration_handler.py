@@ -9,18 +9,15 @@ integrationBp = Blueprint('integrationBp', __name__)
 @firebaseAuthRequired
 def saveIntegration():
     try:
+        clientId = request.clientId
         data = request.json
-        print("data", data)
-        clientId = int(data.get('clientId'))
+        clientId = clientId
         integrationTypeId = int(data.get('integrationType'))
-        print("integrationTypeId", integrationTypeId)
-        print("clientId", clientId)
         apiKey = data.get('apiKey')
         save_integration(clientId, integrationTypeId, apiKey)
         
         return jsonify({"message": "Integration saved successfully"}), 200
     except Exception as e:
-        print(e)
         return jsonify({"error": str(e)}), 500
 
 @integrationBp.route('/integrations/<clientId>', methods=['GET'])

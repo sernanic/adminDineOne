@@ -1,104 +1,104 @@
 import requests
-from flask import current_app, Flask
+from flask import current_app
+from app.services.supabase_service import SupabaseService
 
 class CloverService:
 
     @staticmethod
-    def fetchItems(merchant_id):
-        with current_app.app_context():
-            url = f"https://api.clover.com/v3/merchants/{merchant_id}/items"
-            headers = {
-                "Authorization": f"Bearer {current_app.config['CLOVER_API_KEY']}"
-            }
-            response = requests.get(url, headers=headers)
-            print("clover response", response.json()['elements'])
-            if response.status_code == 200:
-                return response.json()['elements']  # Assuming the items are in the 'elements' key
-            else:
-                response.raise_for_status()
+    def fetchItems(clientId, merchantId):
+        apiKey = CloverService.getCloverApiKey(clientId)
+        url = f"https://api.clover.com/v3/merchants/{merchantId}/items"
+        headers = {
+            "Authorization": f"Bearer {apiKey}"
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()['elements']
+        else:
+            response.raiseForStatus()
 
     @staticmethod
-    def fetchCategories(merchant_id):
-        with current_app.app_context():
-            url = f"https://api.clover.com/v3/merchants/{merchant_id}/categories"
-            headers = {
-                "Authorization": f"Bearer {current_app.config['CLOVER_API_KEY']}"
-            }
-            response = requests.get(url, headers=headers)
-            print("clover response", response.json()['elements'])
-            if response.status_code == 200:
-                return response.json()['elements']  # Assuming the categories are in the 'elements' key
-            else:
-                response.raise_for_status()
+    def fetchCategories(clientId, merchantId):
+        apiKey = CloverService.getCloverApiKey(clientId)
+        url = f"https://api.clover.com/v3/merchants/{merchantId}/categories"
+        headers = {
+            "Authorization": f"Bearer {apiKey}"
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()['elements']
+        else:
+            response.raiseForStatus()
 
     @staticmethod
-    def fetchItemGroups(merchant_id):
-        with current_app.app_context():
-            url = f"https://api.clover.com/v3/merchants/{merchant_id}/item_groups"
-            headers = {
-                "Authorization": f"Bearer {current_app.config['CLOVER_API_KEY']}"
-            }
-            response = requests.get(url, headers=headers)
-            print("clover response", response.json()['elements'])
-            if response.status_code == 200:
-                return response.json()['elements']  # Assuming the item groups are in the 'elements' key
-            else:
-                response.raise_for_status()
+    def fetchItemGroups(clientId, merchantId):
+        apiKey = CloverService.getCloverApiKey(clientId)
+        url = f"https://api.clover.com/v3/merchants/{merchantId}/item_groups"
+        headers = {
+            "Authorization": f"Bearer {apiKey}"
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()['elements']
+        else:
+            response.raiseForStatus()
 
     @staticmethod
-    def fetchModifierGroups(merchant_id):
-        with current_app.app_context():
-            url = f"https://api.clover.com/v3/merchants/{merchant_id}/modifier_groups"
-            headers = {
-                "Authorization": f"Bearer {current_app.config['CLOVER_API_KEY']}"
-            }
-            response = requests.get(url, headers=headers)
-            print("clover response", response.json()['elements'])
-            if response.status_code == 200:
-                return response.json()['elements']  # Assuming the modifier groups are in the 'elements' key
-            else:
-                response.raise_for_status()
+    def fetchModifierGroups(clientId, merchantId):
+        apiKey = CloverService.getCloverApiKey(clientId)
+        url = f"https://api.clover.com/v3/merchants/{merchantId}/modifier_groups"
+        headers = {
+            "Authorization": f"Bearer {apiKey}"
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()['elements']
+        else:
+            response.raiseForStatus()
 
     @staticmethod
-    def fetchModifiers(merchant_id):
-        with current_app.app_context():
-            url = f"https://api.clover.com/v3/merchants/{merchant_id}/modifiers"
-            headers = {
-                "Authorization": f"Bearer {current_app.config['CLOVER_API_KEY']}"
-            }
-            response = requests.get(url, headers=headers)
-            print("clover response", response.json()['elements'])
-            if response.status_code == 200:
-                return response.json()['elements']  # Assuming the modifiers are in the 'elements' key
-            else:
-                response.raise_for_status()
+    def fetchModifiers(clientId, merchantId):
+        apiKey = CloverService.getCloverApiKey(clientId)
+        url = f"https://api.clover.com/v3/merchants/{merchantId}/modifiers"
+        headers = {
+            "Authorization": f"Bearer {apiKey}"
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()['elements']
+        else:
+            response.raiseForStatus()
 
     @staticmethod
-    def fetchItemsByCategory(merchant_id, category_id):
-        with current_app.app_context():
-            url = f"https://api.clover.com/v3/merchants/{merchant_id}/categories/{category_id}/items"
-            headers = {
-                "Authorization": f"Bearer {current_app.config['CLOVER_API_KEY']}"
-            }
-            response = requests.get(url, headers=headers)
-            print("clover response", response.json()['elements'])
-            if response.status_code == 200:
-                print("clover response", response.json())
-                return response.json()['elements']  # Assuming the items are in the 'elements' key
-            else:
-                response.raise_for_status()
+    def fetchItemsByCategory(clientId, merchantId, categoryId):
+        apiKey = CloverService.getCloverApiKey(clientId)
+        url = f"https://api.clover.com/v3/merchants/{merchantId}/categories/{categoryId}/items"
+        headers = {
+            "Authorization": f"Bearer {apiKey}"
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()['elements']
+        else:
+            response.raiseForStatus()
 
     @staticmethod
-    def fetchItemModifierGroups(merchant_id, item_id):
-        with current_app.app_context():
-            print("merchant_id", merchant_id)
-            url = f"https://api.clover.com/v3/merchants/{merchant_id}/items/{item_id}?expand=modifierGroups"
-            headers = {
-                "Authorization": f"Bearer {current_app.config['CLOVER_API_KEY']}"
-            }
-            response = requests.get(url, headers=headers)
-            if response.status_code == 200:
-                return response.json() # Assuming the modifier groups are in the 'elements' key
-            else:
-                response.raise_for_status()
+    def fetchItemModifierGroups(clientId, merchantId, itemId):
+        apiKey = CloverService.getCloverApiKey(clientId)
+        url = f"https://api.clover.com/v3/merchants/{merchantId}/items/{itemId}?expand=modifierGroups"
+        headers = {
+            "Authorization": f"Bearer {apiKey}"
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            response.raiseForStatus()
 
+    @staticmethod
+    def getCloverApiKey(clientId):
+        integration = SupabaseService.getCloverIntegrationByClientId(clientId)
+        if integration and integration.apiKey:
+            return integration.apiKey
+        else:
+            raise ValueError(f"No valid Clover integration found for client ID: {clientId}")

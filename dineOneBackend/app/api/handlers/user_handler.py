@@ -20,7 +20,6 @@ def createUser():
         activationCode = str(random.randint(100000, 999999))
         isActive = False
         uid = data.get('uid')
-        print(firstName, lastName, email, isAdmin)
 
         if not firstName or not lastName:
             return jsonify({"error": "firstName, lastName, qnd email are required"}), 400
@@ -32,7 +31,6 @@ def createUser():
             "user": newUser.toDict()
         }), 201
     except Exception as e:
-        print("Error creating user:", str(e))
         return jsonify({"error": str(e)}), 500
 
 @userBp.route('/user/<string:uid>/view', methods=['GET'])
@@ -45,7 +43,6 @@ def getUser(uid):
         else:
             return jsonify({"error": "User not found"}), 404
     except Exception as e:
-        print("Error getting user:", str(e))
         return jsonify({"error": str(e)}), 500
 
 @userBp.route('/users/list', methods=['GET'])
@@ -56,7 +53,6 @@ def getAllUsers():
         users = SupabaseService.getUsers(clientId)
         return jsonify([user.toDict() for user in users]), 200
     except Exception as e:
-        print("Error getting all users:", str(e))
         return jsonify({"error": str(e)}), 500
 
 @userBp.route('/user/activation', methods=['POST'])
@@ -82,7 +78,6 @@ def activateUser():
             "user": activatedUser.toDict()
         }), 200
     except Exception as e:
-        print("Error activating user:", str(e))
         return jsonify({"error": str(e)}), 500
 
 @userBp.route('/user/<string:uid>/edit', methods=['PUT'])
@@ -108,5 +103,4 @@ def editUser(uid):
             "user": updatedUser.toDict()
         }), 200
     except Exception as e:
-        print("Error updating user:", str(e))
         return jsonify({"error": str(e)}), 500

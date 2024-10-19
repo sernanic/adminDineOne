@@ -14,7 +14,7 @@ def syncModifierGroups():
     clientId = request.clientId
     try:        
         merchantId = "6JDE8MZSA6FJ1"
-        modifierGroups = CloverService.fetchModifierGroups(merchantId)
+        modifierGroups = CloverService.fetchModifierGroups(clientId, merchantId)
         for modifierGroupData in modifierGroups:
             SupabaseService.insertOrUpdateModifierGroup(modifierGroupData, merchantId, clientId)
 
@@ -42,7 +42,6 @@ def getModifierGroups(merchantId):
 
         return jsonify({"modifierGroups": modifierGroupsData}), 200
     except Exception as e:
-        print("error", e)
         return jsonify({"error": str(e)}), 500
 
 
@@ -53,7 +52,7 @@ def syncModifiers():
         currentUser = request.currentUser
         clientId = request.clientId
         merchantId = "6JDE8MZSA6FJ1"
-        modifiers = CloverService.fetchModifiers(merchantId)
+        modifiers = CloverService.fetchModifiers(clientId, merchantId)
         for modifierData in modifiers:
             SupabaseService.insertOrUpdateModifier(modifierData, merchantId, clientId)
 
@@ -106,7 +105,6 @@ def getModifiersByModifierGroupId(merchantId, modifierGroupId):
 
         return jsonify({"modifiers": modifiersData}), 200
     except Exception as e:
-        print("error", e)
         return jsonify({"error": str(e)}), 500
 
 @modifierBp.route('/item/<merchantId>/<itemId>/modifierGroups', methods=['GET'])
@@ -115,7 +113,7 @@ def getItemModifierGroupsWithModifiers(merchantId, itemId):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        modifier_groups_raw = CloverService.fetchItemModifierGroups(merchantId, itemId)
+        modifier_groups_raw = CloverService.fetchItemModifierGroups(clientId, merchantId, itemId)
         modifier_groups = modifier_groups_raw['modifierGroups']['elements']
 
         result = []
@@ -176,7 +174,6 @@ def getModifierById(merchantId, modifierId):
         return jsonify({"modifier": modifierData}), 200
     except Exception as e:
         logging.error(f"Error fetching modifier: {str(e)}")
-        print("error", e)
         return jsonify({"error": str(e)}), 500
 
 @modifierBp.route('/modifier/image', methods=['POST'])

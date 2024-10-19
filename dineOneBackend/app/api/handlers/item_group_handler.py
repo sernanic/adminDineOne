@@ -6,11 +6,12 @@ from app.utils.auth_middleware import firebaseAuthRequired
 itemGroupBp = Blueprint('itemGroupBp', __name__)
 
 @itemGroupBp.route('/sync/itemGroups', methods=['POST'])
+@firebaseAuthRequired
 def syncItemGroups():
     try:
+        clientId = request.clientId
         merchantId = "6JDE8MZSA6FJ1"
-        itemGroups = CloverService.fetchItemGroups(merchantId)
-        print("itemGroups",itemGroups)
+        itemGroups = CloverService.fetchItemGroups(clientId, merchantId)
         # for itemGroupData in itemGroups:
         #     SupabaseService.insertOrUpdateItemGroup(itemGroupData, merchantId)
 

@@ -18,7 +18,6 @@ def createClient():
         newClient = SupabaseService.insertClient(restaurantName)
 
         # Create a user with admin privileges for the new client
-        print("newClient.clientId", newClient.clientId)
         newUser = SupabaseService.insertUser(newClient.clientId, firstName, lastName,True,uid)
 
         return jsonify({
@@ -34,5 +33,4 @@ def createClient():
             }
         }), 201
     except Exception as e:
-        print("Error creating client and user:", str(e))
         return jsonify({"error": str(e)}), 500

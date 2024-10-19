@@ -13,7 +13,7 @@ def sync_categories():
         currentUser = request.currentUser
         clientId = request.clientId
         merchant_id = "6JDE8MZSA6FJ1"
-        categories = CloverService.fetchCategories(merchant_id)
+        categories = CloverService.fetchCategories(clientId, merchant_id)
         for category_data in categories:
             SupabaseService.insert_or_update_category(category_data, merchant_id, clientId)
 
@@ -71,7 +71,7 @@ def get_items_by_category(merchant_id, category_id):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        items = CloverService.fetchItemsByCategory(merchant_id, category_id)
+        items = CloverService.fetchItemsByCategory(clientId, merchant_id, category_id)
         
         items_data = [{
             'id': item.get('id'),

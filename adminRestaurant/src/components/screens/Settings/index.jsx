@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
 import GeneralSettings from './GeneralSettings';
-import SecuritySettings from './SecuritySettings';
-import IntegrationsSettings from './IntegrationsSettings';
-import SupportSettings from './SupportSettings';
-import OrganizationsSettings from './OrganizationsSettings';
-import AdvancedSettings from './AdvancedSettings';
 import UsersSettings from './UsersSettings';
-// import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import RestaurantsSettings from './RestaurantsSettings';
+import IntegrationsSettings from './IntegrationsSettings';
 import { Tabs, Tab } from "@nextui-org/react";
-
 
 const Settings = () => {
     const [selectedTab, setSelectedTab] = useState('general');
@@ -21,18 +16,12 @@ const Settings = () => {
         switch (selectedTab) {
             case 'general':
                 return <GeneralSettings />;
-            case 'security':
-                return <SecuritySettings />;
-            case 'integrations':
-                return <IntegrationsSettings />;
-            case 'support':
-                return <SupportSettings />;
-            case 'organizations':
-                return <OrganizationsSettings />;
-            case 'advanced':
-                return <AdvancedSettings />;
             case 'users':
                 return <UsersSettings />;
+            case 'restaurants':
+                return <RestaurantsSettings />;
+            case 'integrations':
+                return <IntegrationsSettings />;
             default:
                 return <GeneralSettings />;
         }
@@ -49,12 +38,9 @@ const Settings = () => {
                 >
                     {[
                         { name: 'General', id: 'general' },
-                        { name: 'Security', id: 'security' },
-                        { name: 'Integrations', id: 'integrations' },
-                        { name: 'Support', id: 'support' },
-                        { name: 'Organizations', id: 'organizations' },
-                        { name: 'Advanced', id: 'advanced' },
                         { name: 'Users', id: 'users' },
+                        { name: 'Restaurants', id: 'restaurants' },
+                        { name: 'Integrations', id: 'integrations' },
                     ].map((item) => (
                         <Tab key={item.id} title={item.name} />
                     ))}

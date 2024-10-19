@@ -4,6 +4,5 @@ import os
 class Config:
     SUPABASE_URL = os.getenv('SUPABASE_URL')
     SUPABASE_KEY = os.getenv('SUPABASE_KEY')
-    CLOVER_API_KEY = os.getenv('CLOVER_API_KEY')
     SQLALCHEMY_DATABASE_URI = os.getenv('SUPABASE_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
