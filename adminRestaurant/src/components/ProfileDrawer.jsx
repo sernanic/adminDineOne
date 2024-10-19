@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ImageUploader from './shared/imageUploader';
 
 export default function ProfileDrawer({ isOpen, setIsOpen }) {
   const [avatarUrl, setAvatarUrl] = useState('/placeholder.svg?height=100&width=100');
@@ -69,8 +70,10 @@ export default function ProfileDrawer({ isOpen, setIsOpen }) {
       setValue('email', userData.email);
       
       // Set avatar URL if available
-      if (userData.avatarUrl) {
+      if (userData.avatarUrl && userData.avatarUrl.trim() !== '') {
         setAvatarUrl(userData.avatarUrl);
+      } else {
+        setAvatarUrl('/placeholder.svg?height=100&width=100');
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -78,14 +81,37 @@ export default function ProfileDrawer({ isOpen, setIsOpen }) {
     }
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadEnd = () => {
-        setAvatarUrl(reader.result);
-      };
-      reader.readAsDataURL(file);
+  const handleImageUpload = async (imageURL) => {
+    try {
+      const currentUser = getCurrentUser();
+      if (!currentUser) {
+        throw new Error('No authenticated user found');
+      }
+
+      const userId = currentUser.uid;
+      const authToken = await currentUser.getIdToken();
+
+      const response = await fetch(`http://127.0.0.1:4000/user/${userId}/updateAvatar`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          avatarUrl: imageURL,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update user avatar');
+      }
+
+      setAvatarUrl(imageURL);
+      console.log('User avatar updated successfully');
+    } catch (error) {
+      console.error('Error updating user avatar:', error);
+      // Handle error (e.g., show an error message to the user)
     }
   };
 
@@ -150,16 +176,7 @@ export default function ProfileDrawer({ isOpen, setIsOpen }) {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <Label htmlFor="picture" className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2">
-                    Upload Picture
-                  </Label>
-                  <Input
-                    id="picture"
-                    type="file"
-                    accept="image/*"
-                    className="sr-only"
-                    onChange={handleImageUpload}
-                  />
+                  <ImageUploader onImageUploaded={handleImageUpload} bucketName="employeeAvatars" />
                 </div>
               </div>
               <div className="space-y-4">

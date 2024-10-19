@@ -104,3 +104,27 @@ def editUser(uid):
         }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@userBp.route('/user/<string:uid>/updateAvatar', methods=['PUT'])
+@firebaseAuthRequired
+def updateUserAvatar(uid):
+    try:
+        data = request.json
+        print("data", data)
+        avatarUrl = data.get('avatarUrl')
+
+        if not avatarUrl:
+            return jsonify({"error": "avatarUrl is required"}), 400
+
+        user = SupabaseService.getUserByUid(uid)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        updatedUser = SupabaseService.updateUserAvatarUrl(user, avatarUrl)
+
+        return jsonify({
+            "message": "User avatar updated successfully",
+            "user": updatedUser.toDict()
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

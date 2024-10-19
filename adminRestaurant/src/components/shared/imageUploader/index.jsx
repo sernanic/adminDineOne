@@ -94,10 +94,11 @@ export default function ImageUploader({ onImageUploaded, bucketName }) {
       {uploading && <p>Uploading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {imageUrl && (
-        <div>
-          <p>Uploaded image URL:</p>
-          <a href={imageUrl} target="_blank" rel="noopener noreferrer">{imageUrl}</a>
-        </div>
+        <></>
+        // <div>
+        //   <p>Uploaded image URL:</p>
+        //   <a href={imageUrl} target="_blank" rel="noopener noreferrer">{imageUrl}</a>
+        // </div>
       )}
     </div>
   );

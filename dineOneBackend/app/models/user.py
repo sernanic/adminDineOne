@@ -15,8 +15,9 @@ class User(db.Model):
     email = db.Column(db.String(255), nullable=False)
     activationCode = db.Column(db.String(255), nullable=False)
     isActive = db.Column(db.Boolean, default=False)
+    avatarUrl = db.Column(db.String(255), nullable=True)
 
-    def __init__(self, firstName, lastName, clientId, email, activationCode, isActive, isAdmin=False, uid=None):
+    def __init__(self, firstName, lastName, clientId, email, activationCode, isActive, isAdmin=False, uid=None, avatarUrl=None):
         self.firstName = firstName
         self.lastName = lastName
         self.clientId = clientId
@@ -25,6 +26,7 @@ class User(db.Model):
         self.isActive = isActive
         self.isAdmin = isAdmin
         self.uid = uid
+        self.avatarUrl = avatarUrl
 
     def __repr__(self):
         return f'<User {self.firstName} {self.lastName}>'
@@ -41,5 +43,8 @@ class User(db.Model):
             'isActive': self.isActive,
             'createdDate': self.createdDate.isoformat() if self.createdDate else None,
             'modifiedDate': self.modifiedDate.isoformat() if self.modifiedDate else None,
-            'uid': self.uid
+            'uid': self.uid,
+            'avatarUrl': self.avatarUrl
         }
+    def getFullName(self):
+        return f"{self.firstName} {self.lastName}"

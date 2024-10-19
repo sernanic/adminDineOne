@@ -74,6 +74,11 @@ export default function SiteHeader({ onProfileClick }) {
     onProfileClick();
   };
 
+  const handleSettingsClick = () => {
+    setIsDropdownOpen(false);
+    navigate('/settings');
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -169,10 +174,13 @@ export default function SiteHeader({ onProfileClick }) {
                   <IoPersonOutline className="mr-2" size={18} />
                   Profile
                 </button>
-                <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <button 
+                  onClick={handleSettingsClick}
+                  className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
                   <IoSettingsOutline className="mr-2" size={18} />
                   Settings
-                </a>
+                </button>
                 <button 
                   onClick={handleLogout}
                   className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

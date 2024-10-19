@@ -641,3 +641,14 @@ class SupabaseService:
             print("Error updating user:", str(e))
             db.session.rollback()
             raise
+
+    @staticmethod
+    def updateUserAvatarUrl(user, avatarUrl):
+        try:
+            user.avatarUrl = avatarUrl
+            db.session.commit()
+            return user
+        except Exception as e:
+            print("Error updating user avatar URL:", str(e))
+            db.session.rollback()
+            raise
