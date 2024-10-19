@@ -8,6 +8,9 @@ from app.api.handlers.integration_handler import integrationBp
 from app.api.handlers.client_handler import clientBp
 from app.api.handlers.user_handler import userBp
 from app.api.handlers.merchant_handler import merchantBp
+from app.api.handlers.mobileAPI.mobile_category_handler import mobileCategoryBp
+from app.api.handlers.mobileAPI.mobile_item_handler import mobileItemBp
+
 
 api_bp = Blueprint('api_bp', __name__)
 
@@ -20,3 +23,5 @@ api_bp.register_blueprint(integrationBp)
 api_bp.register_blueprint(clientBp)
 api_bp.register_blueprint(userBp)
 api_bp.register_blueprint(merchantBp)
+api_bp.register_blueprint(mobileCategoryBp)
+api_bp.register_blueprint(mobileItemBp)

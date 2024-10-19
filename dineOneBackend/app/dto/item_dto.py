@@ -1,54 +1,38 @@
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import List
 from datetime import datetime
 
 @dataclass
+class ItemImageDTO:
+    id: int
+    imageUrl: str
+
+@dataclass
 class ItemDTO:
-    item_id: str
-    merchant_id: str
-    hidden: bool
-    available: bool
-    auto_manage: bool
-    name: str
-    price: float
-    price_type: Optional[str]
-    default_tax_rates: bool
-    cost: Optional[float]
-    is_revenue: bool
-    modified_time: datetime
-    deleted: bool
+    itemModel: object
+    images: List[ItemImageDTO] = field(default_factory=list)
 
     @classmethod
-    def from_model(cls, item_model):
+    def fromModel(cls, itemModel, itemImages):
         return cls(
-            item_id=item_model.item_id,
-            merchant_id=item_model.merchant_id,
-            hidden=item_model.hidden,
-            available=item_model.available,
-            auto_manage=item_model.auto_manage,
-            name=item_model.name,
-            price=float(item_model.price),
-            price_type=item_model.price_type,
-            default_tax_rates=item_model.default_tax_rates,
-            cost=float(item_model.cost) if item_model.cost is not None else None,
-            is_revenue=item_model.is_revenue,
-            modified_time=item_model.modified_time,
-            deleted=item_model.deleted
+            itemModel=itemModel,
+            images=[ItemImageDTO(id=img.id, imageUrl=img.imageURL) for img in itemImages]
         )
 
-    def to_dict(self):
+    def toDict(self):
         return {
-            'item_id': self.item_id,
-            'merchant_id': self.merchant_id,
-            'hidden': self.hidden,
-            'available': self.available,
-            'auto_manage': self.auto_manage,
-            'name': self.name,
-            'price': self.price,
-            'price_type': self.price_type,
-            'default_tax_rates': self.default_tax_rates,
-            'cost': self.cost,
-            'is_revenue': self.is_revenue,
-            'modified_time': self.modified_time.isoformat() if self.modified_time else None,
-            'deleted': self.deleted
+            'itemId': self.itemModel.id,
+            'merchantId': self.itemModel.merchant_id,
+            'hidden': self.itemModel.hidden,
+            'available': self.itemModel.available,
+            'autoManage': self.itemModel.auto_manage,
+            'name': self.itemModel.name,
+            'price': float(self.itemModel.price),
+            'priceType': self.itemModel.price_type,
+            'defaultTaxRates': self.itemModel.default_tax_rates,
+            'cost': float(self.itemModel.cost) if self.itemModel.cost is not None else None,
+            'isRevenue': self.itemModel.is_revenue,
+            'modifiedTime': self.itemModel.modified_time.isoformat() if self.itemModel.modified_time else None,
+            'deleted': self.itemModel.deleted,
+            'images': [{'id': img.id, 'imageUrl': img.imageURL} for img in self.images]
         }

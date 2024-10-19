@@ -69,6 +69,16 @@ class SupabaseService:
         :return: A list of Item objects
         """
         return Item.query.filter_by(merchant_id=merchant_id, clientId=clientId).all()
+    
+    @staticmethod
+    def getPublicItemsByMerchantId(merchant_id):
+        """
+        Retrieve all items for a given merchant_id.
+        
+        :param merchant_id: The ID of the merchant
+        :return: A list of Item objects
+        """
+        return Item.query.filter_by(merchant_id=merchant_id).all()
 
     @staticmethod
     def insert_or_update_category(category_data, merchant_id, client_id):
@@ -105,10 +115,25 @@ class SupabaseService:
         :return: A list of Category objects
         """
         return Category.query.filter_by(merchantId=merchant_id, clientId=client_id).all()
+    
+    @staticmethod
+    def getPublicCategoriesByMerchantId(merchant_id):
+        """
+        Retrieve all categories for a given merchant_id.
+        
+        :param merchant_id: The ID of the merchant
+        :return: A list of Category objects
+        """
+        return Category.query.filter_by(merchantId=merchant_id).all()
 
     @staticmethod
     def getCategoryById(merchant_id, category_id, client_id):
         return Category.query.filter_by(merchantId=merchant_id, categoryId=category_id, clientId=client_id).first()
+    
+    @staticmethod
+    def getPublicCategoryById(merchant_id, category_id):
+        return Category.query.filter_by(merchantId=merchant_id, categoryId=category_id).first()
+
 
     @staticmethod
     def insertOrUpdateItemGroup(itemGroupData, merchantId, clientId):

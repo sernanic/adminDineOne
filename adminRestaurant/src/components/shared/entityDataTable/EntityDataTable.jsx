@@ -8,6 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { Button as ShadcnButton } from "@/components/ui/button"
+import { Button as NextUIButton } from "@nextui-org/react"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -24,7 +25,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Pagination, Button, PaginationItemType } from "@nextui-org/react"
+import { Pagination, PaginationItemType } from "@nextui-org/react"
 
 export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
   console.log('DataTable props:', { data, columns, filterColumn }) // Add this line
@@ -77,9 +78,9 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <ShadcnButton variant="outline" className="ml-auto">
               Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
+            </ShadcnButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {table
@@ -102,13 +103,14 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
           </DropdownMenuContent>
         </DropdownMenu>
         {onSync && (
-          <Button
-            className="ml-4 bg-black text-white"
+          <NextUIButton
+            className="ml-4"
             onClick={onSync}
             disabled={isSyncing}
+            color="primary"
           >
             {isSyncing ? 'Syncing...' : 'Sync'}
-          </Button>
+          </NextUIButton>
         )}
       </div>
       <div className="rounded-md border">
