@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { DataTable } from '../../shared/entityDataTable/EntityDataTable';
 import { getAuth } from 'firebase/auth';
 import axios from 'axios';
-import { Button } from '@nextui-org/react';
+import { Button, Card } from '@nextui-org/react';
 import AddUserDialog from './AddUserDialog';
 import useMerchantStore from '../../../stores/merchantStore';
 
@@ -56,7 +56,7 @@ const UsersSettings = () => {
     if (error) return <div>Error: {error.message}</div>;
 
     return (
-        <div className="w-full">
+        <Card className="w-full p-6 bg-white">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold">Users</h2>
                 <Button onClick={handleAddUser} className="bg-black text-white">
@@ -73,7 +73,7 @@ const UsersSettings = () => {
                 onClose={handleCloseDialog}
                 onUserAdded={handleUserAdded}
             />
-        </div>
+        </Card>
     );
 };
 

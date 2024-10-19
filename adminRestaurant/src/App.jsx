@@ -58,8 +58,6 @@ function App() {
                 element={<PrivateRoute><ModifierDetails /></PrivateRoute>} 
               />
             </Routes>
-            
-
           </Suspense>
         </BrowserRouter>
       </AuthProvider>

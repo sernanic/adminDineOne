@@ -23,7 +23,7 @@ def createUser():
         print(firstName, lastName, email, isAdmin)
 
         if not firstName or not lastName:
-            return jsonify({"error": "firstName, lastName, email, and password are required"}), 400
+            return jsonify({"error": "firstName, lastName, qnd email are required"}), 400
         
         newUser = SupabaseService.insertUser(clientId, firstName, lastName, email, activationCode, isActive, isAdmin, uid)
 
@@ -35,11 +35,11 @@ def createUser():
         print("Error creating user:", str(e))
         return jsonify({"error": str(e)}), 500
 
-@userBp.route('/user/<int:userId>/view', methods=['GET'])
+@userBp.route('/user/<string:uid>/view', methods=['GET'])
 @firebaseAuthRequired
-def getUser(userId):
+def getUser(uid):
     try:
-        user = SupabaseService.getUser(userId)
+        user = SupabaseService.getUserByUid(uid)
         if user:
             return jsonify(user.toDict()), 200
         else:
@@ -83,4 +83,30 @@ def activateUser():
         }), 200
     except Exception as e:
         print("Error activating user:", str(e))
+        return jsonify({"error": str(e)}), 500
+
+@userBp.route('/user/<string:uid>/edit', methods=['PUT'])
+@firebaseAuthRequired
+def editUser(uid):
+    try:
+        data = request.json
+        firstName = data.get('firstName')
+        lastName = data.get('lastName')
+        email = data.get('email')
+
+        if not all([firstName, lastName, email]):
+            return jsonify({"error": "firstName, lastName, and email are required"}), 400
+
+        user = SupabaseService.getUserByUid(uid)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        updatedUser = SupabaseService.updateUser(user, firstName, lastName, email)
+
+        return jsonify({
+            "message": "User updated successfully",
+            "user": updatedUser.toDict()
+        }), 200
+    except Exception as e:
+        print("Error updating user:", str(e))
         return jsonify({"error": str(e)}), 500

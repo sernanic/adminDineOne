@@ -3,11 +3,12 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import SiteHeader from '../Navigation/SiteHeader';
 import AdminLinks from '../Navigation/AdminLinks';
-import { User, Link, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
-import { BsThreeDotsVertical } from 'react-icons/bs';
+import ProfileDrawer from '../ProfileDrawer';
+import { User, Link } from "@nextui-org/react";
 
 export default function PrivateRoute({ children }) {
   const auth = useAuth();
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
 
   if (!auth) {
     console.error('AuthContext is undefined. Make sure AuthProvider is wrapping your app.');
@@ -47,11 +48,12 @@ export default function PrivateRoute({ children }) {
       </aside>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <SiteHeader />
+      <div className="flex-1 flex flex-col overflow-hidden relative">
+        <SiteHeader onProfileClick={() => setIsProfileDrawerOpen(true)} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto" style={{ backgroundColor: '#F8F8F8' }}>
           {children}
         </main>
+        <ProfileDrawer isOpen={isProfileDrawerOpen} setIsOpen={setIsProfileDrawerOpen} />
       </div>
     </div>
   );

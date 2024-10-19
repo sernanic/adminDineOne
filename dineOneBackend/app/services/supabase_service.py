@@ -628,3 +628,16 @@ class SupabaseService:
             print("Error activating user:", str(e))
             db.session.rollback()
             raise
+
+    @staticmethod
+    def updateUser(user, firstName, lastName, email):
+        try:
+            user.firstName = firstName
+            user.lastName = lastName
+            user.email = email
+            db.session.commit()
+            return user
+        except Exception as e:
+            print("Error updating user:", str(e))
+            db.session.rollback()
+            raise

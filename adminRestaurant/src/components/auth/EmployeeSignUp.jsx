@@ -24,14 +24,12 @@ export default function EmployeeSignUp() {
         const user = userCredential.user;
         console.log('activationCode:', activationCode)
         console.log('user:', user)
-        // Prepare data for backend
+
         const userData = {
           email: data.email,
           activationCode,
           uid: user.uid
         };
-
-        // Send data to backend
         return axios.post('http://127.0.0.1:4000/user/activation', userData);
       })
       .then((response) => {

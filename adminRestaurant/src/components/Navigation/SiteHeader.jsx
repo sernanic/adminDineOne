@@ -5,8 +5,9 @@ import { getAuth, signOut } from 'firebase/auth';
 import { Select, SelectItem } from '@nextui-org/react';
 import axios from 'axios';
 import useMerchantStore from '../../stores/merchantStore';
+import ProfileDrawer from '../ProfileDrawer'; // Import the ProfileDrawer component
 
-export default function SiteHeader() {
+export default function SiteHeader({ onProfileClick }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -15,6 +16,7 @@ export default function SiteHeader() {
   console.log("selectedMerchantId",selectedMerchantId)
   const [merchants, setMerchants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
 
   const getHeaderTitle = () => {
     // ... logic to determine header title based on location.pathname
@@ -65,6 +67,11 @@ export default function SiteHeader() {
       console.error('Error logging out:', error);
       // Optionally, you can show an error message to the user
     }
+  };
+
+  const handleProfileClick = () => {
+    setIsDropdownOpen(false);
+    onProfileClick();
   };
 
   useEffect(() => {
@@ -155,10 +162,13 @@ export default function SiteHeader() {
             </button>
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <button 
+                  onClick={handleProfileClick}
+                  className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
                   <IoPersonOutline className="mr-2" size={18} />
                   Profile
-                </a>
+                </button>
                 <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                   <IoSettingsOutline className="mr-2" size={18} />
                   Settings
@@ -175,6 +185,7 @@ export default function SiteHeader() {
           </div>
         </div>
       </div>
+      <ProfileDrawer isOpen={isProfileDrawerOpen} setIsOpen={setIsProfileDrawerOpen} />
     </header>
   );
 }
