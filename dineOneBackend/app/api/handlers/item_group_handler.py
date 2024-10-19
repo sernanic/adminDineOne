@@ -5,12 +5,12 @@ from app.utils.auth_middleware import firebaseAuthRequired
 
 itemGroupBp = Blueprint('itemGroupBp', __name__)
 
-@itemGroupBp.route('/sync/itemGroups', methods=['POST'])
+# TODO: pass in auth token in frontend
+@itemGroupBp.route('/sync/itemGroups/<merchantId>', methods=['POST'])
 @firebaseAuthRequired
-def syncItemGroups():
+def syncItemGroups(merchantId):
     try:
         clientId = request.clientId
-        merchantId = "6JDE8MZSA6FJ1"
         itemGroups = CloverService.fetchItemGroups(clientId, merchantId)
         # for itemGroupData in itemGroups:
         #     SupabaseService.insertOrUpdateItemGroup(itemGroupData, merchantId)

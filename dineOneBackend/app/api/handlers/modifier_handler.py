@@ -7,13 +7,12 @@ import logging
 
 modifierBp = Blueprint('modifierBp', __name__)
 
-@modifierBp.route('/sync/modifierGroups', methods=['POST'])
+@modifierBp.route('/sync/modifierGroups/<merchantId>', methods=['POST'])
 @firebaseAuthRequired
-def syncModifierGroups():
+def syncModifierGroups(merchantId):
     currentUser = request.currentUser
     clientId = request.clientId
     try:        
-        merchantId = "6JDE8MZSA6FJ1"
         modifierGroups = CloverService.fetchModifierGroups(clientId, merchantId)
         for modifierGroupData in modifierGroups:
             SupabaseService.insertOrUpdateModifierGroup(modifierGroupData, merchantId, clientId)
@@ -45,13 +44,12 @@ def getModifierGroups(merchantId):
         return jsonify({"error": str(e)}), 500
 
 
-@modifierBp.route('/sync/modifiers', methods=['POST'])
+@modifierBp.route('/sync/modifiers/<merchantId>', methods=['POST'])
 @firebaseAuthRequired
-def syncModifiers():
+def syncModifiers(merchantId):
     try:
         currentUser = request.currentUser
         clientId = request.clientId
-        merchantId = "6JDE8MZSA6FJ1"
         modifiers = CloverService.fetchModifiers(clientId, merchantId)
         for modifierData in modifiers:
             SupabaseService.insertOrUpdateModifier(modifierData, merchantId, clientId)

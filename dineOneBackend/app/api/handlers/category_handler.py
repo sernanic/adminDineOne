@@ -6,16 +6,15 @@ from app.utils.auth_middleware import firebaseAuthRequired
 
 category_bp = Blueprint('category_bp', __name__)
 
-@category_bp.route('/sync/categories', methods=['POST'])
+@category_bp.route('/sync/categories/<merchantId>', methods=['POST'])
 @firebaseAuthRequired
-def sync_categories():
+def sync_categories(merchantId):
     try:
         currentUser = request.currentUser
         clientId = request.clientId
-        merchant_id = "6JDE8MZSA6FJ1"
-        categories = CloverService.fetchCategories(clientId, merchant_id)
+        categories = CloverService.fetchCategories(clientId, merchantId)
         for category_data in categories:
-            SupabaseService.insert_or_update_category(category_data, merchant_id, clientId)
+            SupabaseService.insert_or_update_category(category_data, merchantId, clientId)
 
         return jsonify({"message": "Categories synced successfully"}), 200
     except Exception as e:
@@ -40,7 +39,6 @@ def get_categories(merchant_id):
 
         return jsonify({"categories": categories_data}), 200
     except Exception as e:
-        print(e)
         return jsonify({"error": str(e)}), 500
 
 @category_bp.route('/category/<merchant_id>/<category_id>', methods=['GET'])
@@ -49,9 +47,7 @@ def get_category(merchant_id, category_id):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        print("helllo")
         category = SupabaseService.getCategoryById(merchant_id, category_id, clientId)
-        print("category", category)
         if category:
             category_data = {
                 'categoryId': category.categoryId,

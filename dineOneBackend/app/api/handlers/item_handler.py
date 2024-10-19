@@ -8,13 +8,12 @@ from app.utils.auth_middleware import firebaseAuthRequired
 
 item_bp = Blueprint('item_bp', __name__)
 
-@item_bp.route('/sync/items', methods=['POST'])
+@item_bp.route('/sync/items/<merchantId>', methods=['POST'])
 @firebaseAuthRequired
-def syncItems():
+def syncItems(merchantId):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        merchantId = "6JDE8MZSA6FJ1"
         items = CloverService.fetchItems(clientId, merchantId)
         for itemData in items:
             SupabaseService.insertOrUpdateItem(itemData, merchantId, clientId)

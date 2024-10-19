@@ -39,7 +39,7 @@ export function useDataFetching(endpoint, queryKey) {
         throw new Error('User not authenticated')
       }
       const token = await user.getIdToken()
-      return axios.post(`http://127.0.0.1:4000/sync/${endpoint}`, {}, {
+      return axios.post(`http://127.0.0.1:4000/sync/${endpoint}/${selectedMerchantId}`, {}, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
