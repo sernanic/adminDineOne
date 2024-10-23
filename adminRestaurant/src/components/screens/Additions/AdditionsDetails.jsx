@@ -5,17 +5,16 @@ import { getAuth } from 'firebase/auth';
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import { DataTable } from "@/components/shared/entityDataTable/EntityDataTable"
 import { columns } from "./ModifierColumns"
-import { useDataFetching } from "@/components/shared/entityDataTable/entityDataFetching"
 
 const AdditionsDetails = () => {
   const { merchantId, modifierGroupId } = useParams();
   const [modifierGroupName, setModifierGroupName] = useState('');
-  const { data: modifiers, isLoading, error, syncMutation } = useDataFetching('modifiers', 'modifiers', { merchantId, modifierGroupId });
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [modifiers, setModifiers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch modifier group name
-    const fetchModifierGroupName = async () => {
+    const fetchModifierGroupData = async () => {
       try {
         const auth = getAuth();
         const user = auth.currentUser;
@@ -23,29 +22,29 @@ const AdditionsDetails = () => {
         if (!user) {
           throw new Error('User not authenticated');
         }
-
         const idToken = await user.getIdToken();
         
-        const response = await axios.get(`http://127.0.0.1:4000/modifierGroups/${merchantId}/${modifierGroupId}`, {
+        const response = await axios.get(`http://127.0.0.1:4000/modifiers/${merchantId}/modifierGroup/${modifierGroupId}`, {
           headers: {
             Authorization: `Bearer ${idToken}`
           }
         });
         
         setModifierGroupName(response.data.name || 'Addition Details');
+        setModifiers(response.data.modifiers || []);
+        setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching modifier group name:", error);
+        console.error("Error fetching modifier group data:", error);
+        setError(error);
+        setIsLoading(false);
       }
     };
 
-    fetchModifierGroupName();
+    fetchModifierGroupData();
   }, [merchantId, modifierGroupId]);
 
   const handleSync = () => {
-    setIsSyncing(true);
-    syncMutation.mutate(null, {
-      onSettled: () => setIsSyncing(false)
-    });
+    // Implement sync functionality if needed
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -56,6 +55,7 @@ const AdditionsDetails = () => {
     { label: 'Additions', link: '/additions' },
     { label: modifierGroupName },
   ];
+  
 
   return (
     <div className="flex flex-col w-full h-full p-4">
@@ -68,7 +68,7 @@ const AdditionsDetails = () => {
             columns={columns}
             filterColumn="name"
             onSync={handleSync}
-            isSyncing={isSyncing}
+            isSyncing={false}
           />
         </div>
       </div>
