@@ -5,14 +5,13 @@ from app.utils.auth_middleware import firebaseAuthRequired
 
 
 mobileCategoryBp = Blueprint('mobileCategoryBp', __name__)
-@mobileCategoryBp.route('/api/categories/<merchantId>', methods=['GET'])
-def getCategories(merchantId):
+@mobileCategoryBp.route('/api/<clientId>/categories/<merchantId>', methods=['GET'])
+def getCategories(merchantId, clientId):
     try:
         categories = SupabaseService.getPublicCategoriesByMerchantId(merchantId)
-        
         categoriesDTOList = []
         for category in categories:
-            categoryDTO = CategoryService.getCategoryDTOByCategoryId(category.categoryId, merchantId)
+            categoryDTO = CategoryService.getCategoryDTOByCategoryId(category.categoryId, merchantId, clientId)
             if categoryDTO:
                 categoriesDTOList.append(categoryDTO.toDict())
 

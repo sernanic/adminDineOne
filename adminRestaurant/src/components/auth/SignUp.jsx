@@ -7,11 +7,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from 'axios';
+// Add this import for the eye icon
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function SignUp() {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  // Add these state variables
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const onSubmit = (data) => {
     setError('');
@@ -60,25 +65,47 @@ export default function SignUp() {
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <Input 
-          id="password" 
-          type="password" 
-          {...register("password", { required: "Password is required" })}
-          placeholder="Enter your password"
-        />
+        <div className="relative">
+          <Input 
+            id="password" 
+            type={showPassword ? "text" : "password"}
+            {...register("password", { required: "Password is required" })}
+            placeholder="Enter your password"
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
+        </div>
         {errors.password && <p className="text-red-500">{errors.password.message}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">Confirm Password</Label>
-        <Input 
-          id="confirmPassword" 
-          type="password" 
-          {...register("confirmPassword", { 
-            required: "Please confirm your password",
-            validate: (val) => val === watch('password') || "Passwords do not match"
-          })}
-          placeholder="Confirm your password"
-        />
+        <div className="relative">
+          <Input 
+            id="confirmPassword" 
+            type={showConfirmPassword ? "text" : "password"}
+            {...register("confirmPassword", { 
+              required: "Please confirm your password",
+              validate: (val) => val === watch('password') || "Passwords do not match"
+            })}
+            placeholder="Confirm your password"
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
+        </div>
         {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword.message}</p>}
       </div>
       <div className="space-y-2">

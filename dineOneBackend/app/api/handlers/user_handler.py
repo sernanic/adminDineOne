@@ -110,7 +110,6 @@ def editUser(uid):
 def updateUserAvatar(uid):
     try:
         data = request.json
-        print("data", data)
         avatarUrl = data.get('avatarUrl')
 
         if not avatarUrl:

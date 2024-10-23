@@ -18,14 +18,13 @@ class SupabaseService:
 
     @staticmethod
     def insertOrUpdateItem(item_data, merchant_id, client_id):
-        item = Item.query.filter_by(item_id=item_data['id'], merchant_id=merchant_id, clientId=client_id).first()  # Use Clover's id to find the item
+        item = Item.query.filter_by(itemId=item_data['id'], merchant_id=merchant_id, clientId=client_id).first()  # Use Clover's id to find the item
         modified_time = datetime.fromtimestamp(item_data.get('modifiedTime', datetime.now().timestamp() * 1000) / 1000.0)
-        print(type(client_id))
         if item:
             # Update existing item
             if item.clientId != client_id:
                 raise ValueError("Item does not belong to the specified client")
-            item.item_id = item_data['id']
+            item.itemId = item_data['id']
             item.hidden = item_data.get('hidden', item.hidden)
             item.available = item_data.get('available', item.available)
             item.auto_manage = item_data.get('autoManage', item.auto_manage)
@@ -41,7 +40,7 @@ class SupabaseService:
         else:
             # Insert new item
             item = Item(
-                item_id=item_data['id'],  # Map Clover's id to item_id
+                itemId=item_data['id'],  # Map Clover's id to itemId
                 hidden=item_data.get('hidden', False),
                 available=item_data.get('available', True),
                 auto_manage=item_data.get('autoManage', False),
@@ -70,16 +69,6 @@ class SupabaseService:
         """
         return Item.query.filter_by(merchant_id=merchant_id, clientId=clientId).all()
     
-    @staticmethod
-    def getPublicItemsByMerchantId(merchant_id):
-        """
-        Retrieve all items for a given merchant_id.
-        
-        :param merchant_id: The ID of the merchant
-        :return: A list of Item objects
-        """
-        return Item.query.filter_by(merchant_id=merchant_id).all()
-
     @staticmethod
     def insert_or_update_category(category_data, merchant_id, client_id):
         category = Category.query.filter_by(categoryId=category_data['id'], merchantId=merchant_id, clientId=client_id).first()  # Use Clover's id to find the category
@@ -365,16 +354,16 @@ class SupabaseService:
         return CategoryImage.query.filter_by(categoryId=category_id).first()
 
     @staticmethod
-    def getItemById(merchant_id, item_id, client_id):
+    def getItemById(merchant_id, itemId, client_id):
         """
-        Retrieve a specific item for a given merchant_id and item_id.
+        Retrieve a specific item for a given merchant_id and itemId.
         
         :param merchant_id: The ID of the merchant
-        :param item_id: The ID of the item
+        :param itemId: The ID of the item
         :return: An Item object or None if not found
         """
         print("merchant_id", merchant_id)
-        return Item.query.filter_by(merchant_id=merchant_id, item_id=item_id, clientId=client_id).first()
+        return Item.query.filter_by(merchant_id=merchant_id, itemId=itemId, clientId=client_id).first()
 
     @staticmethod
     def insertOrUpdateItemImages(itemId, imageUrls, clientId):
@@ -423,7 +412,7 @@ class SupabaseService:
         Insert a new item image or update an existing one in the itemImages table.
         Raises an error if there are already 6 or more images for the item.
 
-        :param item_id: The ID of the item
+        :param itemId: The ID of the item
         :param image_url: The URL of the image
         :return: The created or updated ItemImage object
         :raises ValueError: If there are already 6 or more images for the item
@@ -676,4 +665,27 @@ class SupabaseService:
         except Exception as e:
             print("Error updating user avatar URL:", str(e))
             db.session.rollback()
+            raise
+
+    @staticmethod
+    def getCategoryItemsByCategoryId(merchantId, categoryId, clientId):
+        """
+        Retrieve all items associated with a specific category for a given merchant and client.
+
+        :param merchantId: The ID of the merchant
+        :param categoryId: The ID of the category
+        :param clientId: The ID of the client
+        :return: A list of Item objects associated with the specified category
+        """
+        try:
+            # Query items that belong to the specified category, merchant, and client
+            categoryItems = Item.query.join(Item.categories).filter(
+                Item.merchant_id == merchantId,
+                Item.clientId == clientId,
+                Category.categoryId == categoryId
+            ).all()
+            
+            return categoryItems
+        except Exception as e:
+            print(f"An error occurred while retrieving category items: {str(e)}")
             raise

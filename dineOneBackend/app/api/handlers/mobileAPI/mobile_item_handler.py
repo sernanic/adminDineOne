@@ -10,7 +10,7 @@ def getItems(merchantId, clientId):
         items = SupabaseService.getItemsByMerchantId(merchantId, clientId)
         itemDTOList = []
         for item in items:
-            itemDTO = ItemService.getItemDTOByItemId(item.item_id, merchantId, clientId)
+            itemDTO = ItemService.getItemDTOByItemId(item.itemId, merchantId, clientId)
             if itemDTO:
                 itemDTOList.append(itemDTO.toDict())
                 

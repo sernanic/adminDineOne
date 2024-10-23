@@ -16,3 +16,11 @@ class ItemImage(db.Model):
 
     def __repr__(self):
         return f"<ItemImage {self.id}>"
+
+    def toDict(self):
+        return {
+            "id": self.id,
+            "itemId": self.itemId,
+            "imageURL": self.imageURL,
+            "clientId": self.clientId
+        }

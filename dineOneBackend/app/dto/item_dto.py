@@ -5,7 +5,7 @@ from datetime import datetime
 @dataclass
 class ItemImageDTO:
     id: int
-    imageUrl: str
+    imageURL: str
 
 @dataclass
 class ItemDTO:
@@ -16,7 +16,7 @@ class ItemDTO:
     def fromModel(cls, itemModel, itemImages):
         return cls(
             itemModel=itemModel,
-            images=[ItemImageDTO(id=img.id, imageUrl=img.imageURL) for img in itemImages]
+            images=[ItemImageDTO(id=img.id, imageURL=img.imageURL) for img in itemImages]
         )
 
     def toDict(self):

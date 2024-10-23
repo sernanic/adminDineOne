@@ -6,7 +6,7 @@ class Item(db.Model):
     __tablename__ = 'items'
 
     id = db.Column(BIGINT, primary_key=True, autoincrement=True)
-    item_id = db.Column(TEXT, nullable=False)
+    itemId = db.Column(TEXT, nullable=False)
     merchant_id = db.Column(TEXT, nullable=False)  # New column
     hidden = db.Column(BOOLEAN, nullable=False, default=False)
     available = db.Column(BOOLEAN, nullable=False, default=True)
@@ -20,10 +20,12 @@ class Item(db.Model):
     modified_time = db.Column(TIMESTAMP(timezone=True), nullable=False)
     deleted = db.Column(BOOLEAN, nullable=False, default=False)
     clientId = db.Column(BIGINT, nullable=False)
+
+    categories = db.relationship('Category', secondary='categoryItems', back_populates='items')
     
 
-    def __init__(self, item_id, merchant_id, hidden, available, auto_manage, name, price, price_type, default_tax_rates, cost, is_revenue, modified_time, deleted, clientId):
-        self.item_id = item_id
+    def __init__(self, itemId, merchant_id, hidden, available, auto_manage, name, price, price_type, default_tax_rates, cost, is_revenue, modified_time, deleted, clientId):
+        self.itemId = itemId
         self.merchant_id = merchant_id  # New parameter
         self.hidden = hidden
         self.available = available

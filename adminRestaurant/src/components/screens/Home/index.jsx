@@ -1,5 +1,5 @@
-import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useEffect } from 'react';
+import useUserStore from '@/stores/userStore';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Users, CreditCard, Activity, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,22 +7,28 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Home() {
-  const auth = useAuth();
-  const currentUser = auth?.currentUser;
+  const { user, loading, error, fetchUser } = useUserStore();
 
-  if (!auth) {
-    console.error("Auth context is undefined");
+  useEffect(() => {
+    fetchUser();
+    console.log(user)
+  }, [fetchUser]);
+
+  if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (!currentUser) {
-    console.error("Current user is undefined");
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!user) {
     return <div>Please log in to view this page.</div>;
   }
 
   return (
     <div className="container mx-auto px-4">
-      <h1 className="text-2xl mb-8">Welcome, {currentUser.email} 👋</h1>
+      <h1 className="tracking-tight text-2xl font-bold mb-8 mt-[15px]">Welcome, {user.firstName} {user.lastName} 👋</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">

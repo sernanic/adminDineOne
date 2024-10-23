@@ -31,7 +31,7 @@ def getItems(merchant_id):
         items = SupabaseService.getItemsByMerchantId(merchant_id, clientId)
         # Convert items to a list of dictionaries
         itemsData = [{
-            'itemId': item.item_id,
+            'itemId': item.itemId,
             'name': item.name,
             'price': item.price,
             'hidden': item.hidden,
@@ -50,16 +50,16 @@ def getItems(merchant_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@item_bp.route('/item/<merchant_id>/<item_id>', methods=['GET'])
+@item_bp.route('/item/<merchant_id>/<itemId>', methods=['GET'])
 @firebaseAuthRequired
-def getItem(merchant_id, item_id):
+def getItem(merchant_id, itemId):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        item = SupabaseService.getItemById(merchant_id, item_id, clientId)
+        item = SupabaseService.getItemById(merchant_id, itemId, clientId)
         if item:
             itemData = {
-                'itemId': item.item_id,
+                'itemId': item.itemId,
                 'name': item.name,
                 'price': item.price,
                 'hidden': item.hidden,
@@ -79,7 +79,7 @@ def getItem(merchant_id, item_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@item_bp.route('/item/<item_id>/images', methods=['POST'])
+@item_bp.route('/item/<itemId>/images', methods=['POST'])
 @firebaseAuthRequired
 def addItemImages():
     currentUser = request.currentUser
@@ -107,13 +107,13 @@ def addItemImages():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@item_bp.route('/item/<item_id>/images', methods=['GET'])
+@item_bp.route('/item/<itemId>/images', methods=['GET'])
 @firebaseAuthRequired
-def getItemImages(item_id):
+def getItemImages(itemId):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        itemImages = SupabaseService.getItemImagesByItemId(item_id, clientId)
+        itemImages = SupabaseService.getItemImagesByItemId(itemId, clientId)
         if itemImages:
             imagesData = [
                 {
