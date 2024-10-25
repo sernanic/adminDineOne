@@ -1,6 +1,7 @@
 from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
+from app.services.cateogoryService import CategoryService
 from app.utils.auth_middleware import firebaseAuthRequired
 
 
@@ -15,11 +16,11 @@ def syncCategories(merchantId):
         clientId = request.clientId
         categories = CloverService.fetchCategories(clientId, merchantId)
         for categoryData in categories:
-            SupabaseService.insert_or_update_category(categoryData, merchantId, clientId)
+            CategoryService.insertOrUpdateCategory(categoryData, merchantId, clientId)
             categoryId = categoryData.get('id')
             items = CloverService.fetchItemsByCategory(clientId, merchantId, categoryId)
             for item in items:
-                SupabaseService.insertOrUpdateCategoryItem(categoryId, item['id'], clientId)
+                CategoryService.insertOrUpdateCategoryItem(categoryId, item['id'], clientId)
                         
 
         return jsonify({"message": "Categories and items synced successfully"}), 200
@@ -32,7 +33,7 @@ def get_categories(merchant_id):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        categories = SupabaseService.getCategoriesByMerchantId(merchant_id, clientId)
+        categories = CategoryService.getCategoriesByMerchantId(merchant_id, clientId)
         
         # Convert categories to a list of dictionaries
         categories_data = [{
@@ -53,7 +54,7 @@ def get_category(merchant_id, category_id):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        category = SupabaseService.getCategoryById(merchant_id, category_id, clientId)
+        category = CategoryService.getCategoryById(merchant_id, category_id, clientId)
         if category:
             category_data = {
                 'categoryId': category.categoryId,
@@ -104,7 +105,7 @@ def add_category_image():
         if not category_id or not image_url:
             return jsonify({"error": "Both categoryId and imageURL are required"}), 400
 
-        category_image = SupabaseService.insertCategoryImage(category_id, image_url, clientId)
+        category_image = CategoryService.insertCategoryImage(category_id, image_url, clientId)
 
         return jsonify({
             "message": "Category image added successfully",
@@ -124,7 +125,7 @@ def get_category_image(category_id):
     try:
         currentUser = request.currentUser
         clientId = request.clientId
-        category_image = SupabaseService.getCategoryImageByCategoryId(category_id)
+        category_image = CategoryService.getCategoryImageByCategoryId(category_id)
         
         if category_image:
             image_data = {
@@ -138,7 +139,6 @@ def get_category_image(category_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @category_bp.route('/category/<merchant_id>/<category_id>', methods=['PUT'])
 @firebaseAuthRequired
 def edit_category(merchant_id, category_id):
@@ -150,7 +150,7 @@ def edit_category(merchant_id, category_id):
         if not data:
             return jsonify({"error": "Category data is required"}), 400
 
-        updated_category = SupabaseService.updateCategory(merchant_id, category_id, data, clientId)
+        updated_category = CategoryService.insertOrUpdateCategory(merchant_id, category_id, data, clientId)
 
         if updated_category:
             category_data = {
