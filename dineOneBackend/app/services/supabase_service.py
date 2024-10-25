@@ -13,6 +13,12 @@ from app.models.modifierImages import ModifierImage
 from app.models.client import Client
 from app.models.user import User
 from app.models.merchant import Merchant
+from app.models.categoryItem import CategoryItem
+from app.models.itemModifierGroups import ItemModifierGroup
+from flask import current_app
+from app.dto.modifier_group_dto import ModifierGroupDTO
+from app.dto.modifier_dto import ModifierDTO
+
 
 class SupabaseService:
 
@@ -362,7 +368,6 @@ class SupabaseService:
         :param itemId: The ID of the item
         :return: An Item object or None if not found
         """
-        print("merchant_id", merchant_id)
         return Item.query.filter_by(merchant_id=merchant_id, itemId=itemId, clientId=client_id).first()
 
     @staticmethod
@@ -689,3 +694,205 @@ class SupabaseService:
         except Exception as e:
             print(f"An error occurred while retrieving category items: {str(e)}")
             raise
+
+    @staticmethod
+    def insertOrUpdateCategoryItem(categoryId, itemId, clientId):
+        """
+        Insert a new CategoryItem or update an existing one.
+
+        :param categoryId: The ID of the category
+        :param itemId: The ID of the item
+        :param clientId: The ID of the client
+        :return: The created or updated CategoryItem object
+        """
+        try:
+            categoryItem = CategoryItem.query.filter_by(
+                categoryId=categoryId,
+                itemId=itemId,
+                clientId=clientId
+            ).first()
+
+            if categoryItem:
+                # CategoryItem already exists, no need to update anything
+                return categoryItem
+            else:
+                # Insert new CategoryItem
+                newCategoryItem = CategoryItem(
+                    categoryId=categoryId,
+                    itemId=itemId,
+                    clientId=clientId
+                )
+                db.session.add(newCategoryItem)
+                db.session.commit()
+                return newCategoryItem
+        except Exception as e:
+            print(f"An error occurred while inserting/updating CategoryItem: {str(e)}")
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def getModifierGroupDTO(clientId, modifierGroupId):
+        """
+        Retrieve a ModifierGroupDTO populated with the modifier group and its associated modifiers,
+        including the image for each modifier.
+
+        :param clientId: The ID of the client
+        :param modifierGroupId: The ID of the modifier group
+        :return: A populated ModifierGroupDTO object
+        """
+        try:
+            # Get the modifier group
+            modifierGroup = ModifierGroup.query.filter_by(
+                modifierGroupId=modifierGroupId,
+                clientId=clientId
+            ).first()
+
+            if not modifierGroup:
+                return None
+
+            # Get all modifiers associated with this modifier group
+            modifiers = Modifier.query.filter_by(
+                modifierGroupId=modifierGroupId,
+                clientId=clientId
+            ).all()
+
+            # Get all modifier IDs
+            modifierIds = [modifier.modifierId for modifier in modifiers]
+
+            # Bulk query for all modifier images
+            modifierImages = ModifierImage.query.filter(
+                ModifierImage.modifierId.in_(modifierIds),
+                ModifierImage.clientId == clientId
+            ).all()
+
+            # Create a dictionary for quick lookup of modifier images
+            imageDict = {image.modifierId: image for image in modifierImages}
+
+            # Create ModifierDTO objects for each modifier, including the image
+            modifierDTOs = []
+            for modifier in modifiers:
+                modifierImage = imageDict.get(modifier.modifierId)
+                modifierDTO = ModifierDTO.fromModel(modifier, modifierImage)
+                modifierDTOs.append(modifierDTO)
+
+            # Create and return the ModifierGroupDTO
+            return ModifierGroupDTO(modifierGroup, modifierDTOs)
+
+        except Exception as e:
+            print(f"An error occurred while retrieving modifier group with modifiers: {str(e)}")
+            raise
+
+    @staticmethod
+    def insertItemModifierGroup(itemId, modifierGroupId, clientId):
+        """
+        Insert a new record into the itemModifierGroups table.
+
+        :param itemId: The ID of the item
+        :param modifierGroupId: The ID of the modifier group
+        :param clientId: The ID of the client
+        :return: The created ItemModifierGroup object
+        """
+        try:
+            # Check if the record already exists
+            existingRecord = ItemModifierGroup.query.filter_by(
+                itemId=itemId,
+                modifierGroupId=modifierGroupId,
+                clientId=clientId
+            ).first()
+
+            if existingRecord:
+                # If the record already exists, return it without making changes
+                return existingRecord
+
+            # Create a new ItemModifierGroup object
+            newItemModifierGroup = ItemModifierGroup(
+                itemId=itemId,
+                modifierGroupId=modifierGroupId,
+                clientId=clientId
+            )
+
+            # Add the new record to the session and commit
+            db.session.add(newItemModifierGroup)
+            db.session.commit()
+
+            return newItemModifierGroup
+
+        except Exception as e:
+            print(f"An error occurred while inserting ItemModifierGroup: {str(e)}")
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def getModifierGroupsByItemId(itemId, clientId):
+        """
+        Retrieve all modifier groups related to a specific item for a given client.
+
+        :param itemId: The ID of the item
+        :param clientId: The ID of the client
+        :return: A list of ModifierGroup objects associated with the specified item
+        """
+        try:
+            modifierGroups = ModifierGroup.query.join(ItemModifierGroup).join(Item).filter(
+                Item.itemId == itemId,
+                Item.clientId == clientId,
+                ModifierGroup.clientId == clientId
+            ).all()
+            
+            return modifierGroups
+        except Exception as e:
+            print(f"An error occurred while retrieving modifier groups for item {itemId}: {str(e)}")
+            raise
+
+    @staticmethod
+    def getModifiersByModifierGroupId(modifierGroupId, clientId):
+        """
+        Retrieve all modifiers associated with a specific modifier group for a given client.
+
+        :param modifierGroupId: The ID of the modifier group
+        :param clientId: The ID of the client
+        :return: A list of Modifier objects associated with the specified modifier group
+        """
+        try:
+            modifiers = Modifier.query.filter_by(
+                modifierGroupId=modifierGroupId,
+                clientId=clientId
+            ).all()
+            
+            return modifiers
+        except Exception as e:
+            print(f"An error occurred while retrieving modifiers for modifier group {modifierGroupId}: {str(e)}")
+            raise
+
+    @staticmethod
+    def getModifierGroupDTOsByItemId(itemId, clientId):
+        """
+        Retrieve a list of ModifierGroupDTOs for a specific item.
+
+        :param itemId: The ID of the item
+        :param clientId: The ID of the client
+        :return: A list of ModifierGroupDTO objects associated with the specified item
+        """
+        try:
+            modifierGroups = SupabaseService.getModifierGroupsByItemId(itemId, clientId)
+            
+            modifierGroupDTOs = []
+            for modifierGroup in modifierGroups:
+                # Get the ModifierGroupDTO for each modifier group
+                modifierGroupDTO = SupabaseService.getModifierGroupDTO(clientId, modifierGroup.modifierGroupId)
+                if modifierGroupDTO:
+                    modifierGroupDTOs.append(modifierGroupDTO.toDict())
+            
+            return modifierGroupDTOs
+
+        except Exception as e:
+            print(f"An error occurred while retrieving ModifierGroupDTOs for item {itemId}: {str(e)}")
+            raise
+
+
+
+
+
+
+
+
+

@@ -63,7 +63,7 @@ function DishDetails() {
         const [dishResponse, imagesResponse, modifierGroupsResponse] = await Promise.all([
           axios.get(`http://127.0.0.1:4000/item/${merchantId}/${itemId}`, { headers }),
           axios.get(`http://127.0.0.1:4000/item/${itemId}/images`, { headers }),
-          axios.get(`http://127.0.0.1:4000/item/${merchantId}/${itemId}/modifierGroups`, { headers })
+          axios.get(`http://127.0.0.1:4000/item/${itemId}/modifierGroups`, { headers })
         ]);
 
         console.log("dishResponse", dishResponse);

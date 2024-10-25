@@ -6,17 +6,23 @@ from app.utils.auth_middleware import firebaseAuthRequired
 
 category_bp = Blueprint('category_bp', __name__)
 
+# TODO: make this a bulk insert/update
 @category_bp.route('/sync/categories/<merchantId>', methods=['POST'])
 @firebaseAuthRequired
-def sync_categories(merchantId):
+def syncCategories(merchantId):
     try:
         currentUser = request.currentUser
         clientId = request.clientId
         categories = CloverService.fetchCategories(clientId, merchantId)
-        for category_data in categories:
-            SupabaseService.insert_or_update_category(category_data, merchantId, clientId)
+        for categoryData in categories:
+            SupabaseService.insert_or_update_category(categoryData, merchantId, clientId)
+            categoryId = categoryData.get('id')
+            items = CloverService.fetchItemsByCategory(clientId, merchantId, categoryId)
+            for item in items:
+                SupabaseService.insertOrUpdateCategoryItem(categoryId, item['id'], clientId)
+                        
 
-        return jsonify({"message": "Categories synced successfully"}), 200
+        return jsonify({"message": "Categories and items synced successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -159,4 +165,5 @@ def edit_category(merchant_id, category_id):
             return jsonify({"error": "Category not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 

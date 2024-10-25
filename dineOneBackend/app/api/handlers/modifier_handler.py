@@ -16,6 +16,17 @@ def syncModifierGroups(merchantId):
         modifierGroups = CloverService.fetchModifierGroups(clientId, merchantId)
         for modifierGroupData in modifierGroups:
             SupabaseService.insertOrUpdateModifierGroup(modifierGroupData, merchantId, clientId)
+        
+        modifiers = CloverService.fetchModifiers(clientId, merchantId)
+        for modifierData in modifiers:
+            SupabaseService.insertOrUpdateModifier(modifierData, merchantId, clientId)
+        
+        merchantItems = SupabaseService.getItemsByMerchantId(merchantId,clientId)
+        for item in merchantItems:
+            modifier_groups_raw = CloverService.fetchItemModifierGroups(clientId, merchantId, item.itemId)
+            modifier_groups = modifier_groups_raw['modifierGroups']['elements']
+            for group in modifier_groups:
+                SupabaseService.insertItemModifierGroup(item.itemId,group['id'],clientId)
 
         return jsonify({"message": "Modifier groups synced successfully"}), 200
     except Exception as e:
@@ -89,7 +100,6 @@ def getModifiersByModifierGroupId(merchantId, modifierGroupId):
         currentUser = request.currentUser
         clientId = request.clientId
         modifiers = SupabaseService.getModifiers(merchantId, modifierGroupId, clientId)
-        
         modifiersData = [{
             'modifierId': modifier.modifierId,
             'merchantId': modifier.merchantId,
@@ -104,31 +114,23 @@ def getModifiersByModifierGroupId(merchantId, modifierGroupId):
         return jsonify({"modifiers": modifiersData}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@modifierBp.route('/item/<merchantId>/<itemId>/modifierGroups', methods=['GET'])
+    
+@modifierBp.route('/item/<itemId>/modifierGroups', methods=['GET'])
 @firebaseAuthRequired
-def getItemModifierGroupsWithModifiers(merchantId, itemId):
+def getItemModifierGroupsWithModifiers(itemId):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        modifier_groups_raw = CloverService.fetchItemModifierGroups(clientId, merchantId, itemId)
-        modifier_groups = modifier_groups_raw['modifierGroups']['elements']
+        
+        modifierGroups = SupabaseService.getModifierGroupsByItemId(itemId, clientId)
 
         result = []
-        for group in modifier_groups:
-            group_data = {
-                'id': group['id'],
-                'name': group['name'],
-                'showByDefault': group['showByDefault'],
-                'sortOrder': group['sortOrder'],
-                'deleted': group['deleted'],
-                'items': group['items'],
-                'modifiers': []
-            }
-            # Fetch modifiers for each group
-            modifiers_raw = SupabaseService.getModifiersByIds(group['modifierIds'], clientId)
+        for group in modifierGroups:
+            groupData = group.toDict()
+            
+            modifiersRaw = SupabaseService.getModifiersByModifierGroupId(group.modifierGroupId, clientId)
 
-            group_data['modifiers'] = [{
+            groupData['modifiers'] = [{
                 'id': modifier.modifierId,
                 'name': modifier.name,
                 'price': float(modifier.price) if modifier.price is not None else None,
@@ -136,9 +138,11 @@ def getItemModifierGroupsWithModifiers(merchantId, itemId):
                 'modifiedTime': modifier.modifiedTime.isoformat() if modifier.modifiedTime else None,
                 'modifierGroupId': modifier.modifierGroupId,
                 'deleted': modifier.deleted
-            } for modifier in modifiers_raw]
+            } for modifier in modifiersRaw]
             
-            result.append(group_data)
+            result.append(groupData)
+        
+        logging.info(f"Result: {result}")
 
         return jsonify({"modifierGroups": result}), 200
 

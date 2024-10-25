@@ -55,7 +55,6 @@ const AdditionsDetails = () => {
     { label: 'Additions', link: '/additions' },
     { label: modifierGroupName },
   ];
-  
 
   return (
     <div className="flex flex-col w-full h-full p-4">

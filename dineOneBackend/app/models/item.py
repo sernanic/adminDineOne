@@ -1,6 +1,7 @@
 from app import db
 from sqlalchemy.dialects.postgresql import BIGINT, BOOLEAN, NUMERIC, TEXT, TIMESTAMP
 from datetime import datetime
+from app.models.itemModifierGroups import ItemModifierGroup
 
 class Item(db.Model):
     __tablename__ = 'items'
@@ -22,6 +23,7 @@ class Item(db.Model):
     clientId = db.Column(BIGINT, nullable=False)
 
     categories = db.relationship('Category', secondary='categoryItems', back_populates='items')
+    modifierGroups = db.relationship('ItemModifierGroup', back_populates='item')
     
 
     def __init__(self, itemId, merchant_id, hidden, available, auto_manage, name, price, price_type, default_tax_rates, cost, is_revenue, modified_time, deleted, clientId):

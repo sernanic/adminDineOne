@@ -1,5 +1,6 @@
 from app import db
 from sqlalchemy.dialects.postgresql import BIGINT, BOOLEAN, TEXT, INTEGER
+from app.models.itemModifierGroups import ItemModifierGroup
 
 class ModifierGroup(db.Model):
     __tablename__ = 'modifierGroup'
@@ -13,6 +14,9 @@ class ModifierGroup(db.Model):
     deleted = db.Column(BOOLEAN, nullable=False, default=False)
     clientId = db.Column(BIGINT, nullable=False)
 
+    # Add this relationship
+    items = db.relationship('ItemModifierGroup', back_populates='modifierGroup')
+
     def __init__(self, modifierGroupId, merchantId, name, showByDefault, sortOrder, deleted, clientId):
         self.modifierGroupId = modifierGroupId
         self.merchantId = merchantId
@@ -21,5 +25,16 @@ class ModifierGroup(db.Model):
         self.sortOrder = sortOrder
         self.deleted = deleted
         self.clientId = clientId
+
     def __repr__(self):
         return f'<ModifierGroup {self.name}>'
+
+    def toDict(self):
+        return {
+            'id': self.modifierGroupId,
+            'name': self.name,
+            'showByDefault': self.showByDefault,
+            'sortOrder': self.sortOrder,
+            'deleted': self.deleted,
+            'items': [item.toDict() for item in self.items] if self.items else None
+        }

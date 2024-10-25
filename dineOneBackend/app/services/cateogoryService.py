@@ -33,8 +33,6 @@ class CategoryService:
                 item = SupabaseService.getItemById(merchantId, categoryItem.itemId, clientId)
                 if item:
                     itemImages = SupabaseService.getItemImagesByItemId(item.itemId, clientId)
-                    for itemImage in itemImages:
-                        print("itemImage", itemImage)
                     itemDTO = ItemDTO.fromModel(item, itemImages)
                     items.append(itemDTO)
 

@@ -10,6 +10,7 @@ from app.api.handlers.user_handler import userBp
 from app.api.handlers.merchant_handler import merchantBp
 from app.api.handlers.mobileAPI.mobile_category_handler import mobileCategoryBp
 from app.api.handlers.mobileAPI.mobile_item_handler import mobileItemBp
+from app.api.handlers.mobileAPI.mobile_modifier_handler import mobileModifierBp
 
 
 api_bp = Blueprint('api_bp', __name__)
@@ -25,3 +26,5 @@ api_bp.register_blueprint(userBp)
 api_bp.register_blueprint(merchantBp)
 api_bp.register_blueprint(mobileCategoryBp)
 api_bp.register_blueprint(mobileItemBp)
+api_bp.register_blueprint(mobileModifierBp)
+
