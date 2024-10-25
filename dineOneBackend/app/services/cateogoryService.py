@@ -1,3 +1,4 @@
+from typing import List, Optional
 import requests
 from flask import current_app
 from app.services.supabase_service import SupabaseService
@@ -13,12 +14,12 @@ from app import db
 class CategoryService:
     
     @staticmethod
-    def getCategoriesByMerchantId(merchantId, clientId):
+    def getCategoriesByMerchantId(merchantId: str, clientId: int) -> List[CategoryDTO]:
         categories = CategoryService.getCategoriesByMerchantId(merchantId, clientId)
         return [CategoryService.getCategoryDTOByCategoryId(category.categoryId, merchantId, clientId) for category in categories]
 
     @staticmethod
-    def getCategoryDTOByCategoryId(categoryId, merchantId, clientId):
+    def getCategoryDTOByCategoryId(categoryId: str, merchantId: str, clientId: int) -> Optional[CategoryDTO]:
         """
         Retrieve a CategoryDTO containing the category, its associated images, and items.
 
@@ -49,32 +50,32 @@ class CategoryService:
             raise
         
     @staticmethod
-    def insertOrUpdateCategory(category_data, merchant_id, client_id):
-        category = Category.query.filter_by(categoryId=category_data['id'], merchantId=merchant_id, clientId=client_id).first()  # Use Clover's id to find the category
+    def insertOrUpdateCategory(categoryData: dict, merchantId: str, clientId: int) -> None:
+        category = Category.query.filter_by(categoryId=categoryData['id'], merchantId=merchantId, clientId=clientId).first()  # Use Clover's id to find the category
         if category:
             # Update existing category
-            if category.clientId != client_id:
+            if category.clientId != clientId:
                 raise ValueError("Category does not belong to the specified client")
-            category.categoryId = category_data['id']
-            category.name = category_data['name']
-            category.sortOrder = category_data.get('sortOrder', category.sortOrder)
-            category.deleted = category_data.get('deleted', category.deleted)
-            category.merchantId = merchant_id
+            category.categoryId = categoryData['id']
+            category.name = categoryData['name']
+            category.sortOrder = categoryData.get('sortOrder', category.sortOrder)
+            category.deleted = categoryData.get('deleted', category.deleted)
+            category.merchantId = merchantId
         else:
             # Insert new category
             category = Category(
-                categoryId=category_data['id'],  # Map Clover's id to categoryId
-                name=category_data['name'],
-                sortOrder=category_data.get('sortOrder', None),
-                deleted=category_data.get('deleted', False),
-                merchantId=merchant_id,
-                clientId=client_id
+                categoryId=categoryData['id'],  # Map Clover's id to categoryId
+                name=categoryData['name'],
+                sortOrder=categoryData.get('sortOrder', None),
+                deleted=categoryData.get('deleted', False),
+                merchantId=merchantId,
+                clientId=clientId
             )
             db.session.add(category)
         db.session.commit()
 
     @staticmethod
-    def getCategoriesByMerchantId(merchant_id, client_id):
+    def getCategoriesByMerchantId(merchant_id: str, client_id: int) -> List[Category]:
         """
         Retrieve all categories for a given merchant_id.
         
@@ -84,7 +85,7 @@ class CategoryService:
         return Category.query.filter_by(merchantId=merchant_id, clientId=client_id).all()
     
     @staticmethod
-    def getPublicCategoriesByMerchantId(merchant_id):
+    def getPublicCategoriesByMerchantId(merchant_id: str) -> List[Category]:
         """
         Retrieve all categories for a given merchant_id.
         
@@ -94,15 +95,15 @@ class CategoryService:
         return Category.query.filter_by(merchantId=merchant_id).all()
 
     @staticmethod
-    def getCategoryById(merchant_id, category_id, client_id):
+    def getCategoryById(merchant_id: str, category_id: str, client_id: int) -> Optional[Category]:
         return Category.query.filter_by(merchantId=merchant_id, categoryId=category_id, clientId=client_id).first()
     
     @staticmethod
-    def getPublicCategoryById(merchant_id, category_id):
+    def getPublicCategoryById(merchant_id: str, category_id: str) -> Optional[Category]:
         return Category.query.filter_by(merchantId=merchant_id, categoryId=category_id).first()
     
     @staticmethod
-    def insertCategoryImage(category_id, image_url):
+    def insertCategoryImage(category_id: str, image_url: str, clientId: int) -> CategoryImage:
         """
         Insert a new category image or update an existing one in the categoryImages table.
 
@@ -111,7 +112,7 @@ class CategoryService:
         :return: The created or updated CategoryImage object
         """
         try:
-            existing_image = CategoryImage.query.filter_by(categoryId=category_id).first()
+            existing_image = CategoryImage.query.filter_by(categoryId=category_id, clientId=clientId).first()
             
             if existing_image:
                 # Update existing image
@@ -122,7 +123,8 @@ class CategoryService:
                 # Insert new image
                 newCategoryImage = CategoryImage(
                     imageURL=image_url,
-                    categoryId=category_id
+                    categoryId=category_id,
+                    clientId=clientId
                 )
                 db.session.add(newCategoryImage)
                 db.session.commit()
@@ -133,7 +135,7 @@ class CategoryService:
             raise
 
     @staticmethod
-    def getCategoryImageByCategoryId(category_id):
+    def getCategoryImageByCategoryId(category_id: str) -> Optional[CategoryImage]:
         """
         Retrieve the category image for a given category ID.
         
@@ -143,7 +145,7 @@ class CategoryService:
         return CategoryImage.query.filter_by(categoryId=category_id).first()
     
     @staticmethod
-    def getCategoryItemsByCategoryId(merchantId, categoryId, clientId):
+    def getCategoryItemsByCategoryId(merchantId: str, categoryId: str, clientId: int) -> List[Item]:
         """
         Retrieve all items associated with a specific category for a given merchant and client.
 
@@ -166,7 +168,7 @@ class CategoryService:
             raise
 
     @staticmethod
-    def insertOrUpdateCategoryItem(categoryId, itemId, clientId):
+    def insertOrUpdateCategoryItem(categoryId: str, itemId: str, clientId: int) -> CategoryItem:
         """
         Insert a new CategoryItem or update an existing one.
 

@@ -9,10 +9,11 @@ class CategoryImage(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
     imageURL = db.Column(TEXT, nullable=False)
     categoryId = db.Column(TEXT, nullable=False)
+    clientId = db.Column(BIGINT, nullable=False)
 
-    def __init__(self, imageURL, categoryId):
+    def __init__(self, imageURL, categoryId, clientId):
         self.imageURL = imageURL
         self.categoryId = categoryId
-
+        self.clientId = clientId
     def __repr__(self):
         return f"<CategoryImage {self.id}>"
