@@ -60,7 +60,7 @@ const AdditionsDetails = () => {
     <div className="flex flex-col w-full h-full p-4">
       <Breadcrumbs items={breadcrumbItems} />
       <div className="flex justify-center items-center mt-4" style={{width: '100%', height: '100%'}}>
-        <div className="bg-white rounded-lg p-4" style={{width: '95%', height: '100%'}}>
+        <div className="bg-white rounded-lg p-4 overflow-auto" style={{width: '95%', height: '85vh'}}>
           <h3 className="text-xl font-semibold mb-2">Modifiers for {modifierGroupName}</h3>
           <DataTable
             data={modifiers}

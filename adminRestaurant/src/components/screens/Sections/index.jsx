@@ -27,8 +27,8 @@ export default function Sections() {
     <div className="flex flex-col w-full h-full p-4">
       <Breadcrumbs items={breadcrumbItems} />
       <div className="flex justify-center items-center mt-4" style={{width: '100%', height: '100%'}}>
-        <div className="bg-white rounded-lg p-4" style={{width: '95%', height: '90%'}}>
-          <DataTable
+        <div className="bg-white rounded-lg p-4 overflow-auto" style={{width: '95%', height: '85vh'}}>
+        <DataTable
             data={sections}
             columns={columns}
             filterColumn="name"

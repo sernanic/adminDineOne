@@ -191,8 +191,8 @@ export default function SectionDetails() {
           </CardFooter>
         </Card>
       )}
-      <div className="flex justify-center items-center" style={{width: '100%', height: '100%'}}>
-      <div className="bg-white rounded-lg p-4" style={{width: '95%', height: '100%'}}>
+      <div className="flex justify-center items-center" style={{width: '100%', height: '85vh'}}>
+      <div className="bg-white rounded-lg p-4 overflow-auto" style={{width: '95%', height: '85vh'}}>
       <h3 className="text-lg font-semibold mt-4 mb-2">Items in this section:</h3>
       <Table>
         <TableHeader>

@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import SiteHeader from '../Navigation/SiteHeader';
 import AdminLinks from '../Navigation/AdminLinks';
 import ProfileDrawer from '../ProfileDrawer';
 import { User, Link } from "@nextui-org/react";
+import useUserStore from '@/stores/userStore';
 
 export default function PrivateRoute({ children }) {
   const auth = useAuth();
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
+  const { user, fetchUser } = useUserStore();
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   if (!auth) {
     console.error('AuthContext is undefined. Make sure AuthProvider is wrapping your app.');
@@ -33,14 +39,14 @@ export default function PrivateRoute({ children }) {
         </div>
         <div className="p-4 flex items-center justify-between">
           <User   
-            name="Junior Garcia"
+            name={user?.firstName + ' ' + user?.lastName || 'Loading...'}
             description={(
-              <Link href="https://twitter.com/jrgarciadev" size="sm" isExternal style={{ color: 'white' }}>
-                @jrgarciadev
+              <Link href="#" size="sm" isExternal style={{ color: 'white' }}>
+                {(user?.email && user.email.slice(0, 15) + '...') || 'Loading...'}
               </Link>
             )}
             avatarProps={{
-              src: "https://avatars.githubusercontent.com/u/30373425?v=4"
+              src: user?.avatarUrl || 'https://via.placeholder.com/150'
             }}
             style={{ color: 'white' }}
           />

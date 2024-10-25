@@ -120,8 +120,8 @@ const ModifierDetails = () => {
     <div className="flex flex-col w-full h-full p-4">
       <Breadcrumbs items={breadcrumbItems} />
       <div className="flex justify-center items-center mt-4" style={{width: '100%', height: '100%'}}>
-        <div className="bg-white rounded-lg p-4" style={{width: '95%', height: '100%'}}>
-          <Card isFooterBlurred className="w-full max-w-[50%] mx-auto h-[300px] col-span-12 sm:col-span-7 mb-8">
+      <div className="bg-white rounded-lg p-4 overflow-auto" style={{width: '95%', height: '85vh'}}>
+      <Card isFooterBlurred className="w-full max-w-[50%] mx-auto h-[300px] col-span-12 sm:col-span-7 mb-8">
             <CardHeader className="absolute z-10 top-1 flex-col items-start"></CardHeader>
             {modifierImage ? (
               <Image
