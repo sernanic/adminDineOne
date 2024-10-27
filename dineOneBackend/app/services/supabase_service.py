@@ -24,13 +24,12 @@ class SupabaseService:
 
     @staticmethod
     def insertOrUpdateItem(item_data, merchant_id, client_id):
-        item = Item.query.filter_by(itemId=item_data['id'], merchant_id=merchant_id, clientId=client_id).first()  # Use Clover's id to find the item
+        item = Item.query.filter_by(itemId=item_data['itemId'], merchant_id=merchant_id, clientId=client_id).first()  # Use Clover's id to find the item
         modified_time = datetime.fromtimestamp(item_data.get('modifiedTime', datetime.now().timestamp() * 1000) / 1000.0)
         if item:
             # Update existing item
             if item.clientId != client_id:
                 raise ValueError("Item does not belong to the specified client")
-            item.itemId = item_data['id']
             item.hidden = item_data.get('hidden', item.hidden)
             item.available = item_data.get('available', item.available)
             item.auto_manage = item_data.get('autoManage', item.auto_manage)
@@ -43,6 +42,7 @@ class SupabaseService:
             item.modified_time = modified_time
             item.deleted = item_data.get('deleted', item.deleted)
             item.merchant_id = merchant_id
+            item.description = item_data.get('description', item.description)
         else:
             # Insert new item
             item = Item(
@@ -59,11 +59,13 @@ class SupabaseService:
                 modified_time=modified_time,
                 deleted=item_data.get('deleted', False),
                 merchant_id=merchant_id,
-                clientId=client_id
+                clientId=client_id,
+                description=item_data.get('description', None)
             )
             db.session.add(item)
 
         db.session.commit()
+        return item;
 
     @staticmethod
     def getItemsByMerchantId(merchant_id, clientId):

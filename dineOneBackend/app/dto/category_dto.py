@@ -17,6 +17,6 @@ class CategoryDTO:
             'sortOrder': self.category.sortOrder,
             'deleted': self.category.deleted,
             'merchantId': self.category.merchantId,
-            'imageUrl': self.categoryImage.imageUrl if self.categoryImage else None,
+            'imageUrl': self.categoryImage.imageURL if self.categoryImage else None,
             'items': [item.toDict() for item in self.items]
         }

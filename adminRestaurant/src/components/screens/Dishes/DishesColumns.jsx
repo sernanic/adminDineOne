@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Eye } from "lucide-react"
 import { useNavigate } from 'react-router-dom'
+import { useState } from "react"
+import  EditDishDialog  from "./EditDishDialog"
 
 export const columns = [
   {
@@ -71,12 +73,23 @@ export const columns = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const dish = row.original
       const navigate = useNavigate()
-      console.log("dish", dish)
+      const [dropdownOpen, setDropdownOpen] = useState(false)
+
+      const handleEdit = () => {
+        setDropdownOpen(false) // Close dropdown when edit is clicked
+        const meta = table.options.meta
+        if (meta?.onEditDish) {
+          meta.onEditDish(dish)
+        } else {
+          console.error('onEditDish function not found in meta options')
+        }
+      }
+
       return (
-        <DropdownMenu>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
@@ -85,12 +98,20 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(dish.item_id)}>
+            <DropdownMenuItem onSelect={() => {
+              setDropdownOpen(false)
+              navigator.clipboard.writeText(dish.itemId)
+            }}>
               Copy dish ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit dish</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/dishes/merchant/${dish.merchantId}/dishes/${dish.itemId}`)}>
+            <DropdownMenuItem onSelect={handleEdit}>
+              Edit dish
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => {
+              setDropdownOpen(false)
+              navigate(`/dishes/merchant/${dish.merchantId}/dishes/${dish.itemId}`)
+            }}>
               <Eye className="mr-2 h-4 w-4" />
               View dish details
             </DropdownMenuItem>

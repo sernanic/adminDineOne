@@ -2,6 +2,7 @@ from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
 from app.utils.auth_middleware import firebaseAuthRequired
+import datetime
 
 
 
@@ -43,7 +44,8 @@ def getItems(merchant_id):
             'isRevenue': item.is_revenue,
             'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
             'deleted': item.deleted,
-            'merchantId': item.merchant_id
+            'merchantId': item.merchant_id,
+            'description': item.description
         } for item in items]
 
         return jsonify({"items": itemsData}), 200
@@ -71,7 +73,8 @@ def getItem(merchant_id, itemId):
                 'isRevenue': item.is_revenue,
                 'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
                 'deleted': item.deleted,
-                'merchantId': item.merchant_id
+                'merchantId': item.merchant_id,
+                'description': item.description
             }
             return jsonify({"item": itemData}), 200
         else:
@@ -165,5 +168,65 @@ def deleteItemImage(imageId):
             return jsonify({"message": "Item image deleted successfully"}), 200
         else:
             return jsonify({"error": "Image not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@item_bp.route('/api/item/edit', methods=['POST'])
+@firebaseAuthRequired
+def createOrUpdateItem():
+    currentUser = request.currentUser
+    clientId = request.clientId
+    try:
+        data = request.json
+        print(data)
+        merchantId = data.get('merchantId')
+        
+        if not merchantId:
+            return jsonify({"error": "merchantId is required"}), 400
+
+        # Required fields validation
+        required_fields = ['name', 'price']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"{field} is required"}), 400
+
+        # Prepare item data
+        itemData = {
+            'itemId': data.get('itemId'),  # For updates
+            'name': data.get('name'),
+            'price': data.get('price'),
+            'hidden': data.get('hidden', False),
+            'available': data.get('available', True),
+            'deleted': data.get('deleted', False),
+            'description': data.get('description', None)
+        }
+
+        # Create or update the item
+        item = SupabaseService.insertOrUpdateItem(itemData, merchantId, clientId)
+
+        # Prepare response data
+        responseData = {
+            'itemId': item.itemId,
+            'name': item.name,
+            'price': float(item.price),
+            'hidden': item.hidden,
+            'available': item.available,
+            'autoManage': item.auto_manage,
+            'priceType': item.price_type,
+            'defaultTaxRates': item.default_tax_rates,
+            'cost': float(item.cost) if item.cost else 0,
+            'isRevenue': item.is_revenue,
+            'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
+            'deleted': item.deleted,
+            'merchantId': item.merchant_id,
+            'description': item.description
+        }
+
+        return jsonify({
+            "message": "Item saved successfully",
+            "item": responseData
+        }), 200
+    except ValueError as ve:
+        return jsonify({"error": str(ve)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -27,8 +27,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Pagination, PaginationItemType } from "@nextui-org/react"
 
-export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
-  console.log('DataTable props:', { data, columns, filterColumn }) // Add this line
+export function DataTable({ data, columns, filterColumn, onSync, isSyncing, meta }) {
+  console.log('DataTable props:', { data, columns, filterColumn, meta }) // Add meta to debug log
 
   const [sorting, setSorting] = React.useState([])
   const [columnFilters, setColumnFilters] = React.useState([])
@@ -59,6 +59,7 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing }) {
       },
     },
     pageCount: Math.ceil(data.length / itemsPerPage),
+    meta, // Add this line to pass meta options to the table instance
   })
 
   const totalPages = table.getPageCount()

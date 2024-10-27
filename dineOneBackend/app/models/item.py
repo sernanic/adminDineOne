@@ -21,12 +21,14 @@ class Item(db.Model):
     modified_time = db.Column(TIMESTAMP(timezone=True), nullable=False)
     deleted = db.Column(BOOLEAN, nullable=False, default=False)
     clientId = db.Column(BIGINT, nullable=False)
+    description = db.Column(TEXT, nullable=True)  # New description field
 
     categories = db.relationship('Category', secondary='categoryItems', back_populates='items')
     modifierGroups = db.relationship('ItemModifierGroup', back_populates='item')
     
 
-    def __init__(self, itemId, merchant_id, hidden, available, auto_manage, name, price, price_type, default_tax_rates, cost, is_revenue, modified_time, deleted, clientId):
+    def __init__(self, itemId, merchant_id, hidden, available, auto_manage, name, price, price_type, 
+                 default_tax_rates, cost, is_revenue, modified_time, deleted, clientId, description=None):  # Added description parameter
         self.itemId = itemId
         self.merchant_id = merchant_id  # New parameter
         self.hidden = hidden
@@ -42,5 +44,6 @@ class Item(db.Model):
         self.modified_time = datetime.fromtimestamp(modified_time / 1000.0) if isinstance(modified_time, (int, float)) else modified_time
         self.deleted = deleted
         self.clientId = clientId
+        self.description = description  # Set description field
     def __repr__(self):
         return f'<Item {self.name}>'

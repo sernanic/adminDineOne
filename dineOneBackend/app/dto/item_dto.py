@@ -21,7 +21,7 @@ class ItemDTO:
 
     def toDict(self):
         return {
-            'itemId': self.itemModel.id,
+            'itemId': self.itemModel.itemId,
             'merchantId': self.itemModel.merchant_id,
             'hidden': self.itemModel.hidden,
             'available': self.itemModel.available,
@@ -34,5 +34,6 @@ class ItemDTO:
             'isRevenue': self.itemModel.is_revenue,
             'modifiedTime': self.itemModel.modified_time.isoformat() if self.itemModel.modified_time else None,
             'deleted': self.itemModel.deleted,
+            'description': self.itemModel.description,
             'images': [{'id': img.id, 'imageUrl': img.imageURL} for img in self.images]
         }
