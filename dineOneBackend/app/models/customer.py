@@ -38,7 +38,7 @@ class Customer(db.Model):
             'clientId': self.clientId,
             'merchantId': self.merchantId,
             'email': self.email,
-            'favoriteItems': [item.itemId for item in self.favoriteItems.all()] if self.favoriteItems else []
+            'favoriteItems': [item.itemId for item in self.favoriteItems.all()] if self.favoriteItems else [],
             'email': self.email
         }
 
