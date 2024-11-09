@@ -45,7 +45,8 @@ def getItems(merchant_id):
             'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
             'deleted': item.deleted,
             'merchantId': item.merchant_id,
-            'description': item.description
+            'description': item.description,
+            'isPopular': item.isPopular
         } for item in items]
 
         return jsonify({"items": itemsData}), 200
@@ -74,7 +75,8 @@ def getItem(merchant_id, itemId):
                 'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
                 'deleted': item.deleted,
                 'merchantId': item.merchant_id,
-                'description': item.description
+                'description': item.description,
+                'isPopular': item.isPopular
             }
             return jsonify({"item": itemData}), 200
         else:
@@ -198,7 +200,8 @@ def createOrUpdateItem():
             'hidden': data.get('hidden', False),
             'available': data.get('available', True),
             'deleted': data.get('deleted', False),
-            'description': data.get('description', None)
+            'description': data.get('description', None),
+            'isPopular': data.get('isPopular', False)
         }
 
         # Create or update the item
@@ -219,7 +222,8 @@ def createOrUpdateItem():
             'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
             'deleted': item.deleted,
             'merchantId': item.merchant_id,
-            'description': item.description
+            'description': item.description,
+            'isPopular': item.isPopular
         }
 
         return jsonify({
@@ -228,5 +232,37 @@ def createOrUpdateItem():
         }), 200
     except ValueError as ve:
         return jsonify({"error": str(ve)}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@item_bp.route('/items/popular/<merchant_id>', methods=['GET'])
+@firebaseAuthRequired
+def getPopularItems(merchant_id):
+    currentUser = request.currentUser
+    clientId = request.clientId
+    try:
+        # Get items where isPopular is True
+        items = SupabaseService.getPopularItemsByMerchantId(merchant_id, clientId)
+        
+        # Convert items to a list of dictionaries
+        itemsData = [{
+            'itemId': item.itemId,
+            'name': item.name,
+            'price': item.price,
+            'hidden': item.hidden,
+            'available': item.available,
+            'autoManage': item.auto_manage,
+            'priceType': item.price_type,
+            'defaultTaxRates': item.default_tax_rates,
+            'cost': item.cost,
+            'isRevenue': item.is_revenue,
+            'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
+            'deleted': item.deleted,
+            'merchantId': item.merchant_id,
+            'description': item.description,
+            'isPopular': item.isPopular
+        } for item in items]
+
+        return jsonify({"items": itemsData}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

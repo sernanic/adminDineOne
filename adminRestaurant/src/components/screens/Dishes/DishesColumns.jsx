@@ -71,6 +71,11 @@ export const columns = [
     cell: ({ row }) => <div>{row.getValue("hidden") ? "Yes" : "No"}</div>,
   },
   {
+    accessorKey: "isPopular",
+    header: "Popular",
+    cell: ({ row }) => <div>{row.getValue("isPopular") ? "Yes" : "No"}</div>,
+  },
+  {
     id: "actions",
     enableHiding: false,
     cell: ({ row, table }) => {

@@ -30,6 +30,8 @@ export default function Dishes() {
       dish.itemId === updatedDish.itemId ? updatedDish : dish
     )
     mutate(newDishes)
+    setIsEditDialogOpen(false)
+    setSelectedDish(null)
   }
 
   if (isLoading) return <div>Loading...</div>
