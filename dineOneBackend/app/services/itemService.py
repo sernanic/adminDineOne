@@ -30,4 +30,15 @@ class ItemService:
         except Exception as e:
             print(f"An error occurred while retrieving ItemDTO: {str(e)}")
             raise
+        
+    @staticmethod
+    def convertItemsToDTO(items, merchantId, clientId):
+        """Helper function to convert items to DTO list"""
+        itemDTOList = []
+        for item in items:
+            itemDTO = ItemService.getItemDTOByItemId(item.itemId, merchantId, clientId)
+            if itemDTO:
+                itemDTOList.append(itemDTO.toDict())
+        return itemDTOList
+
 

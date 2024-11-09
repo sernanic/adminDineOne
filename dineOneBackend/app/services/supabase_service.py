@@ -43,6 +43,7 @@ class SupabaseService:
             item.deleted = item_data.get('deleted', item.deleted)
             item.merchant_id = merchant_id
             item.description = item_data.get('description', item.description)
+            item.isPopular = item_data.get('isPopular', item.isPopular)
         else:
             # Insert new item
             item = Item(
@@ -60,7 +61,8 @@ class SupabaseService:
                 deleted=item_data.get('deleted', False),
                 merchant_id=merchant_id,
                 clientId=client_id,
-                description=item_data.get('description', None)
+                description=item_data.get('description', None),
+                isPopular=item_data.get('isPopular', False)
             )
             db.session.add(item)
 
@@ -736,6 +738,22 @@ class SupabaseService:
         except Exception as e:
             print(f"An error occurred while retrieving ModifierGroupDTOs for item {itemId}: {str(e)}")
             raise
+
+    @staticmethod
+    def getPopularItemsByMerchantId(merchant_id, clientId):
+        """
+        Retrieve all popular items for a given merchant_id.
+        
+        :param merchant_id: The ID of the merchant
+        :param clientId: The ID of the client
+        :return: A list of Item objects where isPopular is True
+        """
+        return Item.query.filter_by(
+            merchant_id=merchant_id, 
+            clientId=clientId,
+            isPopular=True,
+            deleted=False
+        ).all()
 
 
 

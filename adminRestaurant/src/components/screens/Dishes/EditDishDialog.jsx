@@ -1,5 +1,5 @@
 import React from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@nextui-org/react"
@@ -11,7 +11,7 @@ import { Textarea } from "@nextui-org/react"
 
 export function EditDishDialog({ dish, isOpen, onClose, onSave }) {
   const { toast } = useToast()
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const { control, register, handleSubmit, formState: { errors }, reset } = useForm({
     defaultValues: {
       itemId: dish?.itemId || '',
       merchantId: dish?.merchantId || '',
@@ -20,6 +20,7 @@ export function EditDishDialog({ dish, isOpen, onClose, onSave }) {
       price: dish?.price ? (dish.price / 100).toFixed(2) : '',
       hidden: dish?.hidden || false,
       available: dish?.available || true,
+      isPopular: dish?.isPopular || false,
     }
   })
 
@@ -34,6 +35,7 @@ export function EditDishDialog({ dish, isOpen, onClose, onSave }) {
         price: dish.price ? (dish.price / 100).toFixed(2) : '',
         hidden: dish.hidden || false,
         available: dish.available || true,
+        isPopular: dish.isPopular || false,
       })
     }
   }, [dish, reset])
@@ -57,7 +59,7 @@ export function EditDishDialog({ dish, isOpen, onClose, onSave }) {
         },
         body: JSON.stringify({
           ...data,
-          description: data.description || '', // Explicitly include description
+          description: data.description || '',
           price: Math.round(parseFloat(data.price) * 100),
         }),
       })
@@ -67,12 +69,12 @@ export function EditDishDialog({ dish, isOpen, onClose, onSave }) {
       }
 
       const result = await response.json()
+      onSave(result.item)
+      onClose()
       toast({
         title: "Success",
         description: "Dish updated successfully",
       })
-      onSave(result.item)
-      onClose()
     } catch (error) {
       toast({
         title: "Error",
@@ -82,13 +84,8 @@ export function EditDishDialog({ dish, isOpen, onClose, onSave }) {
     }
   }
 
-  const handleClose = () => {
-    reset() // Reset form when closing
-    onClose()
-  }
-
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Dish</DialogTitle>
@@ -131,21 +128,48 @@ export function EditDishDialog({ dish, isOpen, onClose, onSave }) {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Checkbox
-              {...register("available")}
-              defaultSelected={dish?.available}
-            >
-              Available
-            </Checkbox>
+            <Controller
+              name="available"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Checkbox
+                  isSelected={value}
+                  onValueChange={onChange}
+                >
+                  Available
+                </Checkbox>
+              )}
+            />
           </div>
 
           <div className="flex items-center space-x-2">
-            <Checkbox
-              {...register("hidden")}
-              defaultSelected={dish?.hidden}
-            >
-              Hidden
-            </Checkbox>
+            <Controller
+              name="hidden"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Checkbox
+                  isSelected={value}
+                  onValueChange={onChange}
+                >
+                  Hidden
+                </Checkbox>
+              )}
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Controller
+              name="isPopular"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Checkbox
+                  isSelected={value}
+                  onValueChange={onChange}
+                >
+                  Popular
+                </Checkbox>
+              )}
+            />
           </div>
 
           <DialogFooter>
