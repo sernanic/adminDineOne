@@ -3,9 +3,9 @@ from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
 from app.utils.auth_middleware import firebaseAuthRequired
 from app.services.itemService import ItemService
+from app.models.itemImages import ItemImage
+import logging
 import datetime
-
-
 
 
 item_bp = Blueprint('item_bp', __name__)
@@ -32,24 +32,6 @@ def getItems(merchantId):
     try:
         items = SupabaseService.getItemsByMerchantId(merchantId, clientId)
         itemDTOList = ItemService.convertItemsToDTO(items, merchantId, clientId)
-        # Convert items to a list of dictionaries
-        # itemsData = [{
-        #     'itemId': item.itemId,
-        #     'name': item.name,
-        #     'price': item.price,
-        #     'hidden': item.hidden,
-        #     'available': item.available,
-        #     'autoManage': item.auto_manage,
-        #     'priceType': item.price_type,
-        #     'defaultTaxRates': item.default_tax_rates,
-        #     'cost': item.cost,
-        #     'isRevenue': item.is_revenue,
-        #     'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
-        #     'deleted': item.deleted,
-        #     'merchantId': item.merchant_id,
-        #     'description': item.description,
-        #     'isPopular': item.isPopular
-        # } for item in items]
 
         return jsonify({"items": itemDTOList}), 200
     except Exception as e:
@@ -239,4 +221,35 @@ def createOrUpdateItem():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
+@item_bp.route('/api/items/images/reorder', methods=['PUT'])
+@firebaseAuthRequired
+def updateItemImagesSortOrder():
+    try:
+        currentUser = request.currentUser
+        clientId = request.clientId
+        imageUpdates = request.json
+        
+        # Validate request data
+        if not isinstance(imageUpdates, list):
+            return jsonify({"error": "Invalid request format"}), 400
+            
+        for update in imageUpdates:
+            if not all(key in update for key in ['id', 'sortOrder']):
+                return jsonify({"error": "Missing required fields"}), 400
+        
+        # Verify all images belong to the client
+        imageIds = [update['id'] for update in imageUpdates]
+        existingImages = ItemImage.query.filter(
+            ItemImage.id.in_(imageIds),
+            ItemImage.clientId == clientId
+        ).all()
+        
+        if len(existingImages) != len(imageIds):
+            return jsonify({"error": "One or more images not found or unauthorized"}), 404
+        
+        ItemService.updateItemImagesSortOrder(imageUpdates)
+        return jsonify({"message": "Sort order updated successfully"}), 200
+        
+    except Exception as e:
+        logging.error(f"Error in updateItemImagesSortOrder - clientId: {clientId}, error: {str(e)}")
+        return jsonify({"error": "Failed to update sort order"}), 500

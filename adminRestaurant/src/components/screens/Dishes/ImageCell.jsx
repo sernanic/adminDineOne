@@ -17,6 +17,9 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { getAuth } from 'firebase/auth'
+import axios from 'axios'
+
 
 const SortableImageThumbnail = ({ image, index, isSelected, onClick }) => {
   const {
@@ -75,8 +78,45 @@ const ImageCell = ({ images: initialImages }) => {
       setImages((items) => {
         const oldIndex = items.findIndex((item) => item.imageUrl === active.id)
         const newIndex = items.findIndex((item) => item.imageUrl === over.id)
-        return arrayMove(items, oldIndex, newIndex)
+        const reorderedItems = arrayMove(items, oldIndex, newIndex)
+        
+        // Update sortOrder for each item based on new position
+        return reorderedItems.map((item, index) => ({
+          ...item,
+          sortOrder: index
+        }))
       })
+    }
+  }
+
+  const handleUpdateOrder = async () => {
+    try {
+      const auth = getAuth()
+      const user = auth.currentUser
+      if (!user) {
+        throw new Error('User not authenticated')
+      }
+      const token = await user.getIdToken()
+      
+      const imageUpdates = images.map(img => ({
+        id: img.id,
+        sortOrder: img.sortOrder
+      }))
+
+      const response = await axios.put('http://127.0.0.1:4000/api/items/images/reorder', 
+        imageUpdates,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      )
+
+      // Optional: Show success message
+      console.log('Image order updated successfully')
+    } catch (error) {
+      // Handle error appropriately
+      console.error('Error updating image order:', error)
     }
   }
 
@@ -128,10 +168,7 @@ const ImageCell = ({ images: initialImages }) => {
               <Button 
                 color="primary" 
                 className="w-full"
-                onClick={() => {
-                  // Handle order update here
-                  console.log('New order:', images)
-                }}
+                onClick={handleUpdateOrder}
               >
                 Update Order
               </Button>

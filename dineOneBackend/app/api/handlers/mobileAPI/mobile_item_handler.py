@@ -24,3 +24,5 @@ def getPopularItems(clientId, merchantId):
     except Exception as e:
         logging.error(f"Error in getPopularItems - merchantId: {merchantId}, clientId: {clientId}, error: {str(e)}")
         return jsonify({"error": "Failed to fetch popular items"}), 500
+
+

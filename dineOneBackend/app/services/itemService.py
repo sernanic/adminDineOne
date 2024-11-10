@@ -1,7 +1,8 @@
 from flask import current_app
 from app.services.supabase_service import SupabaseService
 from app.dto.item_dto import ItemDTO
-
+from app.models.itemImages import ItemImage
+from app import db
 class ItemService:
     @staticmethod
     def getItemsByMerchantId(merchantId, clientId):
@@ -40,5 +41,27 @@ class ItemService:
             if itemDTO:
                 itemDTOList.append(itemDTO.toDict())
         return itemDTOList
+    
+
+    @staticmethod
+    def updateItemImagesSortOrder(imageUpdates):
+        """
+        Update the sort order of multiple item images
+        
+        :param imageUpdates: List of dictionaries containing image id and new sort order
+        :return: Boolean indicating success
+        """
+        try:
+            for update in imageUpdates:
+                itemImage = ItemImage.query.get(update['id'])
+                if itemImage:
+                    itemImage.sortOrder = update['sortOrder']
+            
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating image sort orders: {str(e)}")
+            raise
 
 
