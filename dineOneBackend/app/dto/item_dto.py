@@ -6,6 +6,7 @@ from datetime import datetime
 class ItemImageDTO:
     id: int
     imageURL: str
+    sortOrder: int
 
 @dataclass
 class ItemDTO:
@@ -16,7 +17,7 @@ class ItemDTO:
     def fromModel(cls, itemModel, itemImages):
         return cls(
             itemModel=itemModel,
-            images=[ItemImageDTO(id=img.id, imageURL=img.imageURL) for img in itemImages]
+            images=[ItemImageDTO(id=img.id, imageURL=img.imageURL, sortOrder=img.sortOrder) for img in itemImages]
         )
 
     def toDict(self):
@@ -35,5 +36,6 @@ class ItemDTO:
             'modifiedTime': self.itemModel.modified_time.isoformat() if self.itemModel.modified_time else None,
             'deleted': self.itemModel.deleted,
             'description': self.itemModel.description,
-            'images': [{'id': img.id, 'imageUrl': img.imageURL} for img in self.images]
+            'images': [{'id': img.id, 'imageUrl': img.imageURL, 'sortOrder': img.sortOrder} for img in self.images],
+            'isPopular': self.itemModel.isPopular
         }

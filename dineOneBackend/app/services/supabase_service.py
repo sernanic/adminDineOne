@@ -308,7 +308,8 @@ class SupabaseService:
                     newImage = ItemImage(
                         itemId=itemId,
                         imageUrl=url,
-                        clientId=clientId
+                        clientId=clientId,
+                        sortOrder=len(existingImages)
                     )
                     db.session.add(newImage)
                     updatedImages.append(newImage)
@@ -342,7 +343,8 @@ class SupabaseService:
             newItemImage = ItemImage(
                 imageURL=imageUrl,
                 itemId=itemId,
-                clientId=clientId
+                clientId=clientId,
+                sortOrder=6
             )
             db.session.add(newItemImage)
             db.session.commit()

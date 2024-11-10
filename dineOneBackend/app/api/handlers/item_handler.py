@@ -2,6 +2,7 @@ from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
 from app.utils.auth_middleware import firebaseAuthRequired
+from app.services.itemService import ItemService
 import datetime
 
 
@@ -23,33 +24,34 @@ def syncItems(merchantId):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@item_bp.route('/items/<merchant_id>', methods=['GET'])
+@item_bp.route('/items/<merchantId>', methods=['GET'])
 @firebaseAuthRequired
-def getItems(merchant_id):
+def getItems(merchantId):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        items = SupabaseService.getItemsByMerchantId(merchant_id, clientId)
+        items = SupabaseService.getItemsByMerchantId(merchantId, clientId)
+        itemDTOList = ItemService.convertItemsToDTO(items, merchantId, clientId)
         # Convert items to a list of dictionaries
-        itemsData = [{
-            'itemId': item.itemId,
-            'name': item.name,
-            'price': item.price,
-            'hidden': item.hidden,
-            'available': item.available,
-            'autoManage': item.auto_manage,
-            'priceType': item.price_type,
-            'defaultTaxRates': item.default_tax_rates,
-            'cost': item.cost,
-            'isRevenue': item.is_revenue,
-            'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
-            'deleted': item.deleted,
-            'merchantId': item.merchant_id,
-            'description': item.description,
-            'isPopular': item.isPopular
-        } for item in items]
+        # itemsData = [{
+        #     'itemId': item.itemId,
+        #     'name': item.name,
+        #     'price': item.price,
+        #     'hidden': item.hidden,
+        #     'available': item.available,
+        #     'autoManage': item.auto_manage,
+        #     'priceType': item.price_type,
+        #     'defaultTaxRates': item.default_tax_rates,
+        #     'cost': item.cost,
+        #     'isRevenue': item.is_revenue,
+        #     'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
+        #     'deleted': item.deleted,
+        #     'merchantId': item.merchant_id,
+        #     'description': item.description,
+        #     'isPopular': item.isPopular
+        # } for item in items]
 
-        return jsonify({"items": itemsData}), 200
+        return jsonify({"items": itemDTOList}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -105,7 +107,7 @@ def addItemImages():
         return jsonify({
             "message": "Item images added successfully",
             "itemImages": [
-                {"id": img.id, "itemId": img.itemId, "imageUrl": img.imageUrl}
+                {"id": img.id, "itemId": img.itemId, "imageUrl": img.imageUrl, "sortOrder": img.sortOrder}
                 for img in itemImages
             ]
         }), 201
@@ -124,7 +126,8 @@ def getItemImages(itemId):
                 {
                     'id': image.id,
                     'itemId': image.itemId,
-                    'imageUrl': image.imageURL
+                    'imageUrl': image.imageURL,
+                    'sortOrder': image.sortOrder
                 } for image in itemImages
             ]
             return jsonify({"itemImages": imagesData}), 200
@@ -153,7 +156,8 @@ def addItemImage():
             "itemImage": {
                 "id": itemImage.id,
                 "itemId": itemImage.itemId,
-                "imageURL": itemImage.imageURL
+                "imageURL": itemImage.imageURL,
+                "sortOrder": itemImage.sortOrder
             }
         }), 201
     except Exception as e:
@@ -235,34 +239,4 @@ def createOrUpdateItem():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@item_bp.route('/items/popular/<merchant_id>', methods=['GET'])
-@firebaseAuthRequired
-def getPopularItems(merchant_id):
-    currentUser = request.currentUser
-    clientId = request.clientId
-    try:
-        # Get items where isPopular is True
-        items = SupabaseService.getPopularItemsByMerchantId(merchant_id, clientId)
-        
-        # Convert items to a list of dictionaries
-        itemsData = [{
-            'itemId': item.itemId,
-            'name': item.name,
-            'price': item.price,
-            'hidden': item.hidden,
-            'available': item.available,
-            'autoManage': item.auto_manage,
-            'priceType': item.price_type,
-            'defaultTaxRates': item.default_tax_rates,
-            'cost': item.cost,
-            'isRevenue': item.is_revenue,
-            'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
-            'deleted': item.deleted,
-            'merchantId': item.merchant_id,
-            'description': item.description,
-            'isPopular': item.isPopular
-        } for item in items]
 
-        return jsonify({"items": itemsData}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500

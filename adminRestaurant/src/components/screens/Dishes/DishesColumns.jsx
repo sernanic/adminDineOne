@@ -13,6 +13,8 @@ import { Eye } from "lucide-react"
 import { useNavigate } from 'react-router-dom'
 import { useState } from "react"
 import  EditDishDialog  from "./EditDishDialog"
+import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react"
+import ImageCell from './ImageCell'
 
 export const columns = [
   {
@@ -33,6 +35,14 @@ export const columns = [
     ),
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    accessorKey: "images",
+    header: "Image",
+    cell: ({ row }) => {
+      const images = row.getValue("images")
+      return <ImageCell images={images} />
+    },
   },
   {
     accessorKey: "name",
