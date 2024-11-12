@@ -6,6 +6,7 @@ import { Select, SelectItem } from '@nextui-org/react';
 import axios from 'axios';
 import useMerchantStore from '../../stores/merchantStore';
 import ProfileDrawer from '../ProfileDrawer'; // Import the ProfileDrawer component
+import MobileNav from './MobileNav'; // Add this import
 
 export default function SiteHeader({ onProfileClick }) {
   const location = useLocation();
@@ -133,17 +134,20 @@ export default function SiteHeader({ onProfileClick }) {
   return (
     <header className="w-full border-b bg-white">
       <div className="flex h-14 items-center px-4 justify-between">
-        <div className="flex items-center">
-          <h1 className="text-xl font-semibold">{getHeaderTitle()}</h1>
+        <div className="flex items-center gap-2">
+          <MobileNav />
+          <h1 className="text-lg md:text-xl font-semibold truncate">{getHeaderTitle()}</h1>
         </div>
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-2 md:space-x-6">
           <Select
             value={selectedMerchantId}
             onChange={handleMerchantChange}
-            className="min-w-[200px]"
+            className="max-w-[140px] md:min-w-[200px]"
             selectedKeys={selectedMerchantId ? [selectedMerchantId] : []}
             labelPlacement="outside"
             isLoading={isLoading}
+            size="sm"
+            variant="bordered"
           >
             {merchants.map((merchant) => (
               <SelectItem key={merchant.merchantId} value={merchant.merchantId}>
@@ -151,10 +155,10 @@ export default function SiteHeader({ onProfileClick }) {
               </SelectItem>
             ))}
           </Select>
-          <button className="text-gray-600 hover:text-gray-900">
+          <button className="hidden md:block text-gray-600 hover:text-gray-900">
             <IoSettingsOutline size={24} />
           </button>
-          <button className="text-gray-600 hover:text-gray-900">
+          <button className="hidden md:block text-gray-600 hover:text-gray-900">
             <IoNotificationsOutline size={24} />
           </button>
           <div className="relative" ref={dropdownRef}>
@@ -162,10 +166,26 @@ export default function SiteHeader({ onProfileClick }) {
               className="text-gray-600 hover:text-gray-900"
               onClick={toggleDropdown}
             >
-              <IoPersonOutline size={24} />
+              <IoPersonOutline size={20} className="md:w-6 md:h-6" />
             </button>
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                <div className="md:hidden">
+                  <button 
+                    onClick={() => navigate('/settings')}
+                    className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <IoSettingsOutline className="mr-2" size={18} />
+                    Settings
+                  </button>
+                  <button 
+                    onClick={() => navigate('/notifications')}
+                    className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <IoNotificationsOutline className="mr-2" size={18} />
+                    Notifications
+                  </button>
+                </div>
                 <button 
                   onClick={handleProfileClick}
                   className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

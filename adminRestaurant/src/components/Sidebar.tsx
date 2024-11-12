@@ -18,7 +18,7 @@ export function Sidebar() {
     <>
       {/* Hamburger menu for mobile */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-20"
+        className="lg:hidden fixed top-4 left-4 z-20 p-2 text-2xl bg-white border rounded shadow-md"
         onClick={() => setIsOpen(!isOpen)}
       >
         ☰
