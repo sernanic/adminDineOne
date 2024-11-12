@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .payment-receipt {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .success-message {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .transaction-details {
+            margin-top: 20px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-receipt">
+        <h2>Payment Confirmation</h2>
+        <p class="success-message">Payment Successful!</p>
+        
+        <div class="transaction-details">
+            <div class="detail-row">
+                <span>Transaction ID:</span>
+                <span>{{ transactionId }}</span>
+            </div>
+            <div class="detail-row">
+                <span>Amount:</span>
+                <span>{{ currency }} {{ amount }}</span>
+            </div>
+            <div class="detail-row">
+                <span>Date:</span>
+                <span>{{ date }}</span>
+            </div>
+            <div class="detail-row">
+                <span>Merchant:</span>
+                <span>{{ merchantName }}</span>
+            </div>
+            <div class="detail-row">
+                <span>Status:</span>
+                <span>{{ status }}</span>
+            </div>
+        </div>
+        
+        <p style="margin-top: 20px; font-size: 0.9em; color: #666;">
+            Thank you for your payment. Please keep this confirmation for your records.
+        </p>
+    </div>
+</body>
+</html> 

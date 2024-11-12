@@ -2,9 +2,10 @@ from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
 from app.utils.auth_middleware import firebaseAuthRequired
+from app.services.itemService import ItemService
+from app.models.itemImages import ItemImage
+import logging
 import datetime
-
-
 
 
 item_bp = Blueprint('item_bp', __name__)
@@ -23,32 +24,16 @@ def syncItems(merchantId):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@item_bp.route('/items/<merchant_id>', methods=['GET'])
+@item_bp.route('/items/<merchantId>', methods=['GET'])
 @firebaseAuthRequired
-def getItems(merchant_id):
+def getItems(merchantId):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        items = SupabaseService.getItemsByMerchantId(merchant_id, clientId)
-        # Convert items to a list of dictionaries
-        itemsData = [{
-            'itemId': item.itemId,
-            'name': item.name,
-            'price': item.price,
-            'hidden': item.hidden,
-            'available': item.available,
-            'autoManage': item.auto_manage,
-            'priceType': item.price_type,
-            'defaultTaxRates': item.default_tax_rates,
-            'cost': item.cost,
-            'isRevenue': item.is_revenue,
-            'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
-            'deleted': item.deleted,
-            'merchantId': item.merchant_id,
-            'description': item.description
-        } for item in items]
+        items = SupabaseService.getItemsByMerchantId(merchantId, clientId)
+        itemDTOList = ItemService.convertItemsToDTO(items, merchantId, clientId)
 
-        return jsonify({"items": itemsData}), 200
+        return jsonify({"items": itemDTOList}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -74,7 +59,8 @@ def getItem(merchant_id, itemId):
                 'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
                 'deleted': item.deleted,
                 'merchantId': item.merchant_id,
-                'description': item.description
+                'description': item.description,
+                'isPopular': item.isPopular
             }
             return jsonify({"item": itemData}), 200
         else:
@@ -103,7 +89,7 @@ def addItemImages():
         return jsonify({
             "message": "Item images added successfully",
             "itemImages": [
-                {"id": img.id, "itemId": img.itemId, "imageUrl": img.imageUrl}
+                {"id": img.id, "itemId": img.itemId, "imageUrl": img.imageUrl, "sortOrder": img.sortOrder}
                 for img in itemImages
             ]
         }), 201
@@ -122,7 +108,8 @@ def getItemImages(itemId):
                 {
                     'id': image.id,
                     'itemId': image.itemId,
-                    'imageUrl': image.imageURL
+                    'imageUrl': image.imageURL,
+                    'sortOrder': image.sortOrder
                 } for image in itemImages
             ]
             return jsonify({"itemImages": imagesData}), 200
@@ -151,7 +138,8 @@ def addItemImage():
             "itemImage": {
                 "id": itemImage.id,
                 "itemId": itemImage.itemId,
-                "imageURL": itemImage.imageURL
+                "imageURL": itemImage.imageURL,
+                "sortOrder": itemImage.sortOrder
             }
         }), 201
     except Exception as e:
@@ -198,7 +186,8 @@ def createOrUpdateItem():
             'hidden': data.get('hidden', False),
             'available': data.get('available', True),
             'deleted': data.get('deleted', False),
-            'description': data.get('description', None)
+            'description': data.get('description', None),
+            'isPopular': data.get('isPopular', False)
         }
 
         # Create or update the item
@@ -219,7 +208,8 @@ def createOrUpdateItem():
             'modifiedTime': item.modified_time.isoformat() if item.modified_time else None,
             'deleted': item.deleted,
             'merchantId': item.merchant_id,
-            'description': item.description
+            'description': item.description,
+            'isPopular': item.isPopular
         }
 
         return jsonify({
@@ -230,3 +220,36 @@ def createOrUpdateItem():
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@item_bp.route('/api/items/images/reorder', methods=['PUT'])
+@firebaseAuthRequired
+def updateItemImagesSortOrder():
+    try:
+        currentUser = request.currentUser
+        clientId = request.clientId
+        imageUpdates = request.json
+        
+        # Validate request data
+        if not isinstance(imageUpdates, list):
+            return jsonify({"error": "Invalid request format"}), 400
+            
+        for update in imageUpdates:
+            if not all(key in update for key in ['id', 'sortOrder']):
+                return jsonify({"error": "Missing required fields"}), 400
+        
+        # Verify all images belong to the client
+        imageIds = [update['id'] for update in imageUpdates]
+        existingImages = ItemImage.query.filter(
+            ItemImage.id.in_(imageIds),
+            ItemImage.clientId == clientId
+        ).all()
+        
+        if len(existingImages) != len(imageIds):
+            return jsonify({"error": "One or more images not found or unauthorized"}), 404
+        
+        ItemService.updateItemImagesSortOrder(imageUpdates)
+        return jsonify({"message": "Sort order updated successfully"}), 200
+        
+    except Exception as e:
+        logging.error(f"Error in updateItemImagesSortOrder - clientId: {clientId}, error: {str(e)}")
+        return jsonify({"error": "Failed to update sort order"}), 500

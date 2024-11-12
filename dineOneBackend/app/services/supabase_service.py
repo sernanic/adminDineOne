@@ -24,7 +24,7 @@ class SupabaseService:
 
     @staticmethod
     def insertOrUpdateItem(item_data, merchant_id, client_id):
-        item = Item.query.filter_by(itemId=item_data['itemId'], merchant_id=merchant_id, clientId=client_id).first()  # Use Clover's id to find the item
+        item = Item.query.filter_by(itemId=item_data['id'], merchant_id=merchant_id, clientId=client_id).first()  # Use Clover's id to find the item
         modified_time = datetime.fromtimestamp(item_data.get('modifiedTime', datetime.now().timestamp() * 1000) / 1000.0)
         if item:
             # Update existing item
@@ -34,7 +34,7 @@ class SupabaseService:
             item.available = item_data.get('available', item.available)
             item.auto_manage = item_data.get('autoManage', item.auto_manage)
             item.name = item_data['name']
-            item.price = item_data['price']
+            item.price = item_data['price'] # clover returns price in cents
             item.price_type = item_data.get('priceType', item.price_type or '')  # Ensure price_type is not None
             item.default_tax_rates = item_data.get('defaultTaxRates', item.default_tax_rates)
             item.cost = item_data.get('cost', item.cost)
@@ -43,6 +43,7 @@ class SupabaseService:
             item.deleted = item_data.get('deleted', item.deleted)
             item.merchant_id = merchant_id
             item.description = item_data.get('description', item.description)
+            item.isPopular = item_data.get('isPopular', item.isPopular)
         else:
             # Insert new item
             item = Item(
@@ -51,7 +52,7 @@ class SupabaseService:
                 available=item_data.get('available', True),
                 auto_manage=item_data.get('autoManage', False),
                 name=item_data['name'],
-                price=item_data['price'],
+                price=item_data['price'], # clover returns price in cents
                 price_type=item_data.get('priceType', ''),  # Ensure price_type is not None
                 default_tax_rates=item_data.get('defaultTaxRates', False),
                 cost=item_data.get('cost', 0),  # Ensure cost is not None
@@ -60,7 +61,8 @@ class SupabaseService:
                 deleted=item_data.get('deleted', False),
                 merchant_id=merchant_id,
                 clientId=client_id,
-                description=item_data.get('description', None)
+                description=item_data.get('description', None),
+                isPopular=item_data.get('isPopular', False)
             )
             db.session.add(item)
 
@@ -306,7 +308,8 @@ class SupabaseService:
                     newImage = ItemImage(
                         itemId=itemId,
                         imageUrl=url,
-                        clientId=clientId
+                        clientId=clientId,
+                        sortOrder=len(existingImages)
                     )
                     db.session.add(newImage)
                     updatedImages.append(newImage)
@@ -340,7 +343,8 @@ class SupabaseService:
             newItemImage = ItemImage(
                 imageURL=imageUrl,
                 itemId=itemId,
-                clientId=clientId
+                clientId=clientId,
+                sortOrder=6
             )
             db.session.add(newItemImage)
             db.session.commit()
@@ -736,6 +740,22 @@ class SupabaseService:
         except Exception as e:
             print(f"An error occurred while retrieving ModifierGroupDTOs for item {itemId}: {str(e)}")
             raise
+
+    @staticmethod
+    def getPopularItemsByMerchantId(merchant_id, clientId):
+        """
+        Retrieve all popular items for a given merchant_id.
+        
+        :param merchant_id: The ID of the merchant
+        :param clientId: The ID of the client
+        :return: A list of Item objects where isPopular is True
+        """
+        return Item.query.filter_by(
+            merchant_id=merchant_id, 
+            clientId=clientId,
+            isPopular=True,
+            deleted=False
+        ).all()
 
 
 

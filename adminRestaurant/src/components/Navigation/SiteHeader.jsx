@@ -110,7 +110,6 @@ export default function SiteHeader({ onProfileClick }) {
       if (response.data.merchants.length > 0) {
         const storedMerchantId = localStorage.getItem('selectedMerchantId');
         if (storedMerchantId && response.data.merchants.some(m => m.merchantId === storedMerchantId)) {
-          console.log("hello")
           setSelectedMerchantId(storedMerchantId);
           console.log("selectedMerchantId",selectedMerchantId)
         } else {
