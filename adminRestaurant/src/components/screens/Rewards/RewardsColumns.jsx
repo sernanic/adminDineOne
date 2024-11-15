@@ -3,6 +3,28 @@ import { FaEdit, FaTrash } from "react-icons/fa"
 
 export const columns = [
   {
+    accessorKey: "imageURL",
+    header: "Image",
+    cell: ({ row }) => {
+      const imageURL = row.original.imageURL
+      return (
+        <div className="flex items-center justify-center">
+          {imageURL ? (
+            <img 
+              src={imageURL} 
+              alt={row.original.rewardName} 
+              className="h-12 w-12 object-cover rounded-lg"
+            />
+          ) : (
+            <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-xs">
+              No image
+            </div>
+          )}
+        </div>
+      )
+    }
+  },
+  {
     accessorKey: "rewardName",
     header: "Name",
   },
@@ -13,24 +35,6 @@ export const columns = [
   {
     accessorKey: "pointsRequired",
     header: "Points Required",
-  },
-  {
-    accessorKey: "imageURL",
-    header: "Image",
-    cell: ({ row }) => {
-      const imageURL = row.original.imageURL
-      return imageURL ? (
-        <img 
-          src={imageURL} 
-          alt={row.original.rewardName} 
-          className="h-10 w-10 object-cover rounded"
-        />
-      ) : (
-        <div className="h-10 w-10 bg-gray-200 rounded flex items-center justify-center">
-          No image
-        </div>
-      )
-    }
   },
   {
     id: "actions",

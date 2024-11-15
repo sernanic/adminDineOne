@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import ImageUploader from '@/components/shared/imageUploader'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function EditRewardDialog({ reward, isOpen, onClose, onSave, isAddMode }) {
   const [formData, setFormData] = React.useState({
@@ -50,6 +52,13 @@ export default function EditRewardDialog({ reward, isOpen, onClose, onSave, isAd
     }))
   }
 
+  const handleImageUpload = (imageURL) => {
+    setFormData(prev => ({
+      ...prev,
+      imageURL
+    }))
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -57,6 +66,33 @@ export default function EditRewardDialog({ reward, isOpen, onClose, onSave, isAd
           <DialogTitle>{isAddMode ? 'Add New Reward' : 'Edit Reward'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
+            <Label>Reward Image</Label>
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative w-40 h-40 rounded-lg overflow-hidden bg-gray-100">
+                {formData.imageURL ? (
+                  <img 
+                    src={formData.imageURL} 
+                    alt={formData.rewardName || "Reward preview"} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full text-gray-400">
+                    No image
+                  </div>
+                )}
+              </div>
+              <div className="w-full">
+                <ImageUploader
+                  currentImageUrl={formData.imageURL}
+                  onImageUploaded={handleImageUpload}
+                  bucketName="rewardImages"
+                  className="w-full"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="rewardName">Name</Label>
             <Input
@@ -87,17 +123,6 @@ export default function EditRewardDialog({ reward, isOpen, onClose, onSave, isAd
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="imageURL">Image URL</Label>
-            <Input
-              id="imageURL"
-              type="url"
-              value={formData.imageURL}
-              onChange={handleChange('imageURL')}
-              placeholder="https://example.com/image.jpg"
-            />
-          </div>
-
           <div className="flex items-center space-x-2">
             <Switch
               id="status"
@@ -113,7 +138,9 @@ export default function EditRewardDialog({ reward, isOpen, onClose, onSave, isAd
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Save</Button>
+            <Button type="submit">
+              {isAddMode ? 'Create Reward' : 'Update Reward'}
+            </Button>
           </div>
         </form>
       </DialogContent>
