@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { NextUIProvider } from "@nextui-org/react";
+import { Toaster } from "@/components/ui/toaster"
 
 // Import non-lazy loaded components
 import PrivateRoute from './components/auth/PrivateRoute';
@@ -15,6 +16,7 @@ const Sections = lazy(() => import('./components/screens/Sections'));
 const Additions = lazy(() => import('./components/screens/Additions'));
 const Orders = lazy(() => import('./components/screens/Orders'));
 const Dishes = lazy(() => import('./components/screens/Dishes'));
+const Rewards = lazy(() => import('./components/screens/Rewards'));
 const Settings = lazy(() => import('./components/screens/Settings'));
 const SectionDetails = lazy(() => import('./components/screens/Sections/SectionDetails'));
 const DishDetails = lazy(() => import('./components/screens/Dishes/DishDetails'));
@@ -37,7 +39,7 @@ function App() {
               <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
               <Route path="/sections" element={<PrivateRoute><Sections /></PrivateRoute>} />
               <Route 
-                path="/sections/merchant/:merchantId/sections/:categoryId" 
+                path="/sections/merchant/:merchantId/category/:categoryId" 
                 element={<PrivateRoute><SectionDetails /></PrivateRoute>} 
               />
               <Route path="/additions" element={<PrivateRoute><Additions /></PrivateRoute>} />
@@ -47,6 +49,7 @@ function App() {
               />
               <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
               <Route path="/dishes" element={<PrivateRoute><Dishes /></PrivateRoute>} />
+              <Route path="/rewards" element={<PrivateRoute><Rewards /></PrivateRoute>} />
               <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
               <Route path="*" element={<PrivateRoute><div>Page not found</div></PrivateRoute>} />
               <Route 
@@ -54,13 +57,14 @@ function App() {
                 element={<PrivateRoute><DishDetails /></PrivateRoute>} 
               />
               <Route 
-                path="/modifiers/:merchantId/modifier/:modifierId" 
+                path="/additions/merchant/:merchantId/modifier/:modifierId" 
                 element={<PrivateRoute><ModifierDetails /></PrivateRoute>} 
               />
             </Routes>
           </Suspense>
         </BrowserRouter>
       </AuthProvider>
+      <Toaster />
     </NextUIProvider>
   );
 }

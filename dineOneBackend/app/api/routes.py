@@ -14,6 +14,8 @@ from app.api.handlers.mobileAPI.mobile_modifier_handler import mobileModifierBp
 from app.api.handlers.mobileAPI.mobile_payment_handler import mobilePaymentBp
 from app.api.handlers.mobileAPI.mobile_customer_handler import mobileCustomerBp
 from app.api.handlers.order_handler import orderBp
+from app.api.handlers.reward_handler import reward_bp
+
 
 
 api_bp = Blueprint('api_bp', __name__)
@@ -33,3 +35,5 @@ api_bp.register_blueprint(mobileModifierBp)
 api_bp.register_blueprint(mobilePaymentBp)
 api_bp.register_blueprint(mobileCustomerBp)
 api_bp.register_blueprint(orderBp)
+api_bp.register_blueprint(reward_bp)
+
