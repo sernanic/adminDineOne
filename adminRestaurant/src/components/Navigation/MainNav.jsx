@@ -15,6 +15,7 @@ const menuItems = [
     { name: 'Dishes', path: '/dishes'  },
     { name: 'Additions', path: '/additions'  },
     { name: 'Orders', path: '/orders'  },
+    { name: 'Features', path: '/features'  },
     
   ];
 

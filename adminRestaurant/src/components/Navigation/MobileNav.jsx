@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Menu as MenuIcon, Home, Layers, PlusCircle, ShoppingCart, Utensils } from 'lucide-react';
+import { Menu as MenuIcon, Home, Layers, PlusCircle, ShoppingCart, Utensils, Star } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const mobileItems = [
@@ -11,6 +11,7 @@ const mobileItems = [
   { name: 'Additions', path: '/additions', icon: PlusCircle },
   { name: 'Orders', path: '/orders', icon: ShoppingCart },
   { name: 'Dishes', path: '/dishes', icon: Utensils },
+  { name: 'Features', path: '/features', icon: Star },
 ];
 
 export default function MobileNav() {

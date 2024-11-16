@@ -17,6 +17,7 @@ const Additions = lazy(() => import('./components/screens/Additions'));
 const Orders = lazy(() => import('./components/screens/Orders'));
 const Dishes = lazy(() => import('./components/screens/Dishes'));
 const Rewards = lazy(() => import('./components/screens/Rewards'));
+const Features = lazy(() => import('./components/screens/Features'));
 const Settings = lazy(() => import('./components/screens/Settings'));
 const SectionDetails = lazy(() => import('./components/screens/Sections/SectionDetails'));
 const DishDetails = lazy(() => import('./components/screens/Dishes/DishDetails'));
@@ -50,6 +51,7 @@ function App() {
               <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
               <Route path="/dishes" element={<PrivateRoute><Dishes /></PrivateRoute>} />
               <Route path="/rewards" element={<PrivateRoute><Rewards /></PrivateRoute>} />
+              <Route path="/features" element={<PrivateRoute><Features /></PrivateRoute>} />
               <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
               <Route path="*" element={<PrivateRoute><div>Page not found</div></PrivateRoute>} />
               <Route 

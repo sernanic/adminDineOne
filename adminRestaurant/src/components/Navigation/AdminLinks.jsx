@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaChartBar, FaList, FaUtensils, FaPlus, FaShoppingCart, FaCog, FaGift } from 'react-icons/fa';
+import { FaChartBar, FaList, FaUtensils, FaPlus, FaShoppingCart, FaCog, FaGift,FaStar } from 'react-icons/fa';
 
 const NavLink = ({ to, icon: Icon, children }) => {
   const location = useLocation();
@@ -23,10 +23,11 @@ export default function AdminLinks() {
   return (
     <nav className="mt-5 space-y-2">
       <NavLink to="/" icon={FaChartBar}>Dashboard</NavLink>
-      <NavLink to="/sections" icon={FaList}>Sections</NavLink>
+      <NavLink to="/orders" icon={FaShoppingCart}>Orders</NavLink>
       <NavLink to="/dishes" icon={FaUtensils}>Dishes</NavLink>
       <NavLink to="/additions" icon={FaPlus}>Additions</NavLink>
-      <NavLink to="/orders" icon={FaShoppingCart}>Orders</NavLink>
+      <NavLink to="/sections" icon={FaList}>Sections</NavLink>
+      <NavLink to="/features" icon={FaStar}>Features</NavLink>
       <NavLink to="/rewards" icon={FaGift}>Rewards</NavLink>
       <NavLink to="/settings" icon={FaCog}>Settings</NavLink>
     </nav>

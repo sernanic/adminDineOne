@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from sqlalchemy.orm import relationship
 
 class Client(db.Model):
     __tablename__ = 'client'

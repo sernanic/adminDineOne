@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaList, FaPlus, FaShoppingCart, FaUtensils, FaCog, FaGift } from 'react-icons/fa';
+import { FaList, FaPlus, FaShoppingCart, FaUtensils, FaCog, FaGift, FaStar } from 'react-icons/fa';
 
 const menuItems = [
   { name: 'Sections', path: '/sections', icon: FaList },
@@ -8,6 +8,7 @@ const menuItems = [
   { name: 'Orders', path: '/orders', icon: FaShoppingCart },
   { name: 'Dishes', path: '/dishes', icon: FaUtensils },
   { name: 'Rewards', path: '/rewards', icon: FaGift },
+  { name: 'Features', path: '/features', icon: FaStar },
   { name: 'Settings', path: '/settings', icon: FaCog },
 ];
 

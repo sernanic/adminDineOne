@@ -1,113 +1,107 @@
 import React from "react"
 import { DataTable } from "@/components/shared/entityDataTable/EntityDataTable"
-import { columns } from "./RewardsColumns"
+import { columns } from "./FeaturesColumns"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Breadcrumbs from "@/components/shared/Breadcrumbs"
-import EditRewardDialog from "./EditRewardDialog"
+import EditFeatureDialog from "./EditFeatureDialog"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import useMerchantStore from "@/stores/merchantStore"
-import { useRewards } from "./useRewards"
+import { useFeatures } from "./useFeatures"
 
-export default function Rewards() {
+export default function Features() {
   const { currentUser } = useAuth()
   const { toast } = useToast()
   const selectedMerchantId = useMerchantStore((state) => state.selectedMerchantId)
-  const [selectedReward, setSelectedReward] = React.useState(null)
+  const [selectedFeature, setSelectedFeature] = React.useState(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
   const [isAddMode, setIsAddMode] = React.useState(false)
 
   const { 
-    rewards, 
+    features, 
     isLoading, 
     error,
-    createReward,
-    updateReward,
-    deleteReward 
-  } = useRewards({ currentUser, selectedMerchantId })
+    createFeature,
+    updateFeature,
+    deleteFeature 
+  } = useFeatures({ currentUser, selectedMerchantId })
 
-  const handleEditReward = (reward) => {
+  const handleEditFeature = (feature) => {
     setIsAddMode(false)
-    setSelectedReward(reward)
+    setSelectedFeature(feature)
     setIsEditDialogOpen(true)
   }
 
-  const handleAddReward = () => {
+  const handleAddFeature = () => {
     setIsAddMode(true)
-    setSelectedReward({
-      rewardName: "",
+    setSelectedFeature({
+      name: "",
       description: "",
-      pointsRequired: 0,
       imageURL: "",
-      deleted: false,
+      itemId: null,
     })
     setIsEditDialogOpen(true)
   }
 
-  const handleSave = async (reward) => {
+  const handleSave = (feature) => {
     if (isAddMode) {
-      createReward(reward)
+      createFeature(feature)
     } else {
-      updateReward(reward)
+      updateFeature(feature)
     }
     setIsEditDialogOpen(false)
-    setSelectedReward(null)
   }
 
   if (error) {
     toast({
       title: "Error",
-      description: "Failed to fetch rewards",
+      description: "Failed to fetch features",
       variant: "destructive",
     })
   }
 
   const breadcrumbItems = [
     { label: 'Home', link: '/' },
-    { label: 'Rewards' },
+    { label: 'Features' },
   ]
-
-  if (isLoading) return <div>Loading...</div>
 
   return (
     <div className="container mx-auto py-10">
       <Breadcrumbs items={breadcrumbItems} />
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-2xl font-bold">Rewards</CardTitle>
-          <Button onClick={handleAddReward}>
-            <Plus className="mr-2 h-4 w-4" /> Add Reward
+          <CardTitle className="text-2xl font-bold">Features</CardTitle>
+          <Button onClick={handleAddFeature}>
+            <Plus className="mr-2 h-4 w-4" /> Add Feature
           </Button>
         </CardHeader>
         <CardContent>
           <DataTable
             columns={columns}
-            data={rewards}
+            data={features}
             isLoading={isLoading}
-            filterColumn="rewardName"
+            filterColumn="name"
             meta={{
-              onEditReward: handleEditReward,
-              onDeleteReward: deleteReward,
-              updateData: handleSave
+              onEdit: handleEditFeature,
+              onDelete: deleteFeature,
             }}
           />
         </CardContent>
       </Card>
 
-      {selectedReward && (
-        <EditRewardDialog
-          reward={selectedReward}
-          isOpen={isEditDialogOpen}
-          onClose={() => {
-            setIsEditDialogOpen(false)
-            setSelectedReward(null)
-          }}
-          onSave={handleSave}
-          isAddMode={isAddMode}
-        />
-      )}
+      <EditFeatureDialog
+        key={selectedFeature?.id || 'new'}
+        isOpen={isEditDialogOpen}
+        onClose={() => {
+          setIsEditDialogOpen(false)
+          setSelectedFeature(null)
+        }}
+        onSave={handleSave}
+        feature={selectedFeature}
+        isAddMode={isAddMode}
+      />
     </div>
   )
 }
