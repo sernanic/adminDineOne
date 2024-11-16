@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import SiteHeader from '../Navigation/SiteHeader';
 import AdminLinks from '../Navigation/AdminLinks';
-import ProfileDrawer from '../ProfileDrawer';
+import ProfileDrawer from '../shared/ProfileDrawer';
 import { User, Link } from "@nextui-org/react";
 import useUserStore from '@/stores/userStore';
 

@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { getAuth } from 'firebase/auth';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import ImageUploader from './shared/imageUploader';
+import ImageUploader from '../imageUploader';
 
 export default function ProfileDrawer({ isOpen, setIsOpen }) {
   const [avatarUrl, setAvatarUrl] = useState('/placeholder.svg?height=100&width=100');

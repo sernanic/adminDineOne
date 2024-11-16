@@ -5,7 +5,7 @@ import { getAuth, signOut } from 'firebase/auth';
 import { Select, SelectItem } from '@nextui-org/react';
 import axios from 'axios';
 import useMerchantStore from '../../stores/merchantStore';
-import ProfileDrawer from '../ProfileDrawer'; // Import the ProfileDrawer component
+import ProfileDrawer from '../shared/ProfileDrawer'; // Import the ProfileDrawer component
 import MobileNav from './MobileNav'; // Add this import
 
 export default function SiteHeader({ onProfileClick }) {
