@@ -68,8 +68,9 @@ export const columns = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigate(`/modifiers/${modifier.merchantId}/modifier/${modifier.modifierId}`)}>
+            <DropdownMenuLabel>Actions</DropdownMenuLabel> 
+
+            <DropdownMenuItem onClick={() => navigate(`/additions/merchant/${modifier.merchantId}/modifier/${modifier.modifierId}`)}>
               <Eye className="mr-2 h-4 w-4" />
               View modifier details
             </DropdownMenuItem>

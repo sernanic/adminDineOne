@@ -1,6 +1,44 @@
 import { Button } from "@/components/ui/button"
-import { FaEdit, FaTrash } from "react-icons/fa"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { MoreHorizontal } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState } from "react"
+
+const ActionCell = ({ row, table }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const feature = row.original
+  
+  return (
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem 
+          onClick={() => {
+            setIsOpen(false)
+            table.options.meta?.onEdit(feature)
+          }}
+        >
+          Edit feature
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => {
+            setIsOpen(false)
+            table.options.meta?.onDelete(feature.id)
+          }}
+          className="text-red-600"
+        >
+          Delete feature
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 export const columns = [
   {
@@ -30,26 +68,6 @@ export const columns = [
   },
   {
     id: "actions",
-    cell: ({ row, table }) => {
-      const feature = row.original
-      return (
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => table.options.meta?.onEdit(feature)}
-            className="h-8 w-8 p-0"
-          >
-            <FaEdit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => table.options.meta?.onDelete(feature.id)}
-            className="h-8 w-8 p-0 text-red-600"
-          >
-            <FaTrash className="h-4 w-4" />
-          </Button>
-        </div>
-      )
-    },
+    cell: ActionCell
   },
 ]

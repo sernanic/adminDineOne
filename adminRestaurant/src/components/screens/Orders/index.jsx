@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { DataTable } from "@/components/shared/entityDataTable/EntityDataTable"
 import { useDataFetching } from "@/components/shared/entityDataTable/entityDataFetching"
 import { columns } from "./OrdersColumns"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Breadcrumbs from "@/components/shared/Breadcrumbs"
 import { OrderDetailsDialog } from "./OrderDetailsDialog"
 
@@ -21,10 +22,13 @@ export default function Orders() {
   ]
 
   return (
-    <div className="flex flex-col w-full h-full p-4">
+    <div className="container mx-auto py-10">
       <Breadcrumbs items={breadcrumbItems} />
-      <div className="flex justify-center items-center mt-4" style={{width: '100%', height: '100%'}}>
-        <div className="bg-white rounded-lg p-4 overflow-auto" style={{width: '95%', height: '85vh'}}>
+      <Card className="mt-6">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-2xl font-bold">Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
           <DataTable
             data={orders}
             columns={columns({ 
@@ -35,8 +39,8 @@ export default function Orders() {
             })}
             filterColumn="orderId"
           />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
       <OrderDetailsDialog 
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}

@@ -113,14 +113,20 @@ const UsersSettings = () => {
         <Card className="w-full p-6 bg-white h-[80vh] max-h-[80%] overflow-auto">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold">Users</h2>
-                <Button onClick={handleAddUser} className="bg-black text-white">
+                {/* <Button onClick={handleAddUser} className="bg-black text-white">
                     Add User
-                </Button>
+                </Button> */}
             </div>
             <DataTable
                 data={users || []}
                 columns={columns}
                 filterColumn="firstName"
+                moreActions={[
+                    {
+                        label: "Add User",
+                        onClick: handleAddUser
+                    }
+                ]}
             />
             <AddUserDialog
                 isOpen={isAddUserDialogOpen}

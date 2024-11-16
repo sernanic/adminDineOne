@@ -4,8 +4,6 @@ import { columns } from "./FeaturesColumns"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Breadcrumbs from "@/components/shared/Breadcrumbs"
 import EditFeatureDialog from "./EditFeatureDialog"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import useMerchantStore from "@/stores/merchantStore"
@@ -73,9 +71,6 @@ export default function Features() {
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">Features</CardTitle>
-          <Button onClick={handleAddFeature}>
-            <Plus className="mr-2 h-4 w-4" /> Add Feature
-          </Button>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -87,6 +82,12 @@ export default function Features() {
               onEdit: handleEditFeature,
               onDelete: deleteFeature,
             }}
+            moreActions={[
+              {
+                label: "Add Feature",
+                onClick: handleAddFeature
+              }
+            ]}
           />
         </CardContent>
       </Card>

@@ -24,10 +24,12 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import { Pagination, PaginationItemType } from "@nextui-org/react"
 
-export function DataTable({ data, columns, filterColumn, onSync, isSyncing, meta }) {
+export function DataTable({ data, columns, filterColumn, onSync, isSyncing, meta, moreActions }) {
   console.log('DataTable props:', { data, columns, filterColumn, meta }) // Add meta to debug log
 
   const [sorting, setSorting] = React.useState([])
@@ -36,6 +38,7 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing, meta
   const [rowSelection, setRowSelection] = React.useState({})
   const [currentPage, setCurrentPage] = React.useState(1)
   const itemsPerPage = 10
+  const [isMoreActionsOpen, setIsMoreActionsOpen] = React.useState(false)
 
   const table = useReactTable({
     data,
@@ -112,6 +115,30 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing, meta
           >
             {isSyncing ? 'Syncing...' : 'Sync'}
           </NextUIButton>
+        )}
+        {moreActions && moreActions.length > 0 && (
+          <DropdownMenu open={isMoreActionsOpen} onOpenChange={setIsMoreActionsOpen}>
+            <DropdownMenuTrigger asChild>
+              <ShadcnButton variant="outline" className="ml-4">
+                More Actions <ChevronDown className="ml-2 h-4 w-4" />
+              </ShadcnButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              {moreActions.map((action, index) => (
+                <DropdownMenuItem
+                  key={index}
+                  className="capitalize"
+                  onClick={() => {
+                    setIsMoreActionsOpen(false);
+                    action.onClick();
+                  }}
+                >
+                  {action.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
       <div className="rounded-md border">

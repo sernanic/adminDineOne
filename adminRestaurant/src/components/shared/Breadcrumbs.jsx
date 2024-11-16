@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react';
 
 const Breadcrumbs = ({ items }) => {
   return (
-    <nav className="flex pl-[5%]" aria-label="Breadcrumb">
+    <nav className="flex pl-[1%]" aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
         {items.map((item, index) => (
           <li key={index} className="inline-flex items-center">

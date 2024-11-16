@@ -77,9 +77,6 @@ export default function Rewards() {
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">Rewards</CardTitle>
-          <Button onClick={handleAddReward}>
-            <Plus className="mr-2 h-4 w-4" /> Add Reward
-          </Button>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -92,6 +89,12 @@ export default function Rewards() {
               onDeleteReward: deleteReward,
               updateData: handleSave
             }}
+            moreActions={[
+              {
+                label: "Add Reward",
+                onClick: handleAddReward
+              }
+            ]}
           />
         </CardContent>
       </Card>

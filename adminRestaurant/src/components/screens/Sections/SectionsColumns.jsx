@@ -65,7 +65,7 @@ export const columns = [
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>Edit section</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(`/sections/merchant/${section.merchantId}/sections/${section.categoryId}`)}>
+              <DropdownMenuItem onClick={() => navigate(`/sections/merchant/${section.merchantId}/category/${section.categoryId}`)}>
                 <Eye className="mr-2 h-4 w-4" />
                 View section details
               </DropdownMenuItem>

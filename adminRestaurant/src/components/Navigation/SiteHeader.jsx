@@ -136,7 +136,7 @@ export default function SiteHeader({ onProfileClick }) {
       <div className="flex h-14 items-center px-4 justify-between">
         <div className="flex items-center gap-2">
           <MobileNav />
-          <h1 className="text-lg md:text-xl font-semibold truncate">{getHeaderTitle()}</h1>
+          <h1 className="text-lg md:text-xl font-semibold truncate">Dine One</h1>
         </div>
         <div className="flex items-center space-x-2 md:space-x-6">
           <Select
