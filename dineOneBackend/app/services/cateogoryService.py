@@ -50,13 +50,19 @@ class CategoryService:
             raise
         
     @staticmethod
-    def insertOrUpdateCategory(categoryData: dict, merchantId: str, clientId: int) -> None:
-        category = Category.query.filter_by(categoryId=categoryData['id'], merchantId=merchantId, clientId=clientId).first()  # Use Clover's id to find the category
+    def insertOrUpdateCategory(categoryData: dict, merchantId: str, clientId: int) -> Category:
+        # Get the category ID from either 'id' or 'categoryId' field
+        category_id = categoryData.get('id') or categoryData.get('categoryId')
+        if not category_id:
+            raise ValueError("Category ID is required")
+            
+        category = Category.query.filter_by(categoryId=category_id, merchantId=merchantId, clientId=clientId).first()
+        
         if category:
             # Update existing category
             if category.clientId != clientId:
                 raise ValueError("Category does not belong to the specified client")
-            category.categoryId = categoryData['id']
+            category.categoryId = category_id
             category.name = categoryData['name']
             category.sortOrder = categoryData.get('sortOrder', category.sortOrder)
             category.deleted = categoryData.get('deleted', category.deleted)
@@ -64,7 +70,7 @@ class CategoryService:
         else:
             # Insert new category
             category = Category(
-                categoryId=categoryData['id'],  # Map Clover's id to categoryId
+                categoryId=category_id,
                 name=categoryData['name'],
                 sortOrder=categoryData.get('sortOrder', None),
                 deleted=categoryData.get('deleted', False),
@@ -73,6 +79,7 @@ class CategoryService:
             )
             db.session.add(category)
         db.session.commit()
+        return category
 
     @staticmethod
     def getCategoriesByMerchantId(merchant_id: str, client_id: int) -> List[Category]:
@@ -199,5 +206,30 @@ class CategoryService:
                 return newCategoryItem
         except Exception as e:
             print(f"An error occurred while inserting/updating CategoryItem: {str(e)}")
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def deleteCategoryImage(category_id: str, client_id: int) -> bool:
+        """
+        Delete a category image from the database.
+
+        :param category_id: The ID of the category
+        :param client_id: The ID of the client
+        :return: True if deletion was successful, False if image was not found
+        """
+        try:
+            category_image = CategoryImage.query.filter_by(
+                categoryId=category_id,
+                clientId=client_id
+            ).first()
+            
+            if category_image:
+                db.session.delete(category_image)
+                db.session.commit()
+                return True
+            return False
+        except Exception as e:
+            print(f"An error occurred while deleting category image: {str(e)}")
             db.session.rollback()
             raise

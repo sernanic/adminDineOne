@@ -48,7 +48,7 @@ export const routes = {
     },
     details: {
       path: '/sections/merchant/:merchantId/category/:categoryId',
-      component: SectionDetails
+      component: lazy(() => import('@/components/screens/Sections/SectionDetails')),
     }
   },
   dishes: {

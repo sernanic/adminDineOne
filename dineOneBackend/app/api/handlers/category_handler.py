@@ -139,18 +139,19 @@ def get_category_image(category_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@category_bp.route('/category/<merchant_id>/<category_id>', methods=['PUT'])
+@category_bp.route('/category/<merchantId>/<categoryId>', methods=['PUT'])
 @firebaseAuthRequired
-def edit_category(merchant_id, category_id):
+def edit_category(merchantId, categoryId):
     try:
         currentUser = request.currentUser
         clientId = request.clientId
-        data = request.json
+        categoryData = request.json
         
-        if not data:
+        if not categoryData:
             return jsonify({"error": "Category data is required"}), 400
 
-        updated_category = CategoryService.insertOrUpdateCategory(merchant_id, category_id, data, clientId)
+        updated_category = CategoryService.insertOrUpdateCategory(categoryData, merchantId, clientId)
+
 
         if updated_category:
             category_data = {
@@ -167,3 +168,21 @@ def edit_category(merchant_id, category_id):
         return jsonify({"error": str(e)}), 500
 
 
+
+@category_bp.route('/category/image/<category_id>', methods=['DELETE'])
+@firebaseAuthRequired
+def delete_category_image(category_id):
+    try:
+        clientId = request.clientId
+
+        if not category_id:
+            return jsonify({"error": "Category ID is required"}), 400
+
+        success = CategoryService.deleteCategoryImage(category_id, clientId)
+
+        if success:
+            return jsonify({"message": "Category image deleted successfully"}), 200
+        else:
+            return jsonify({"error": "Category image not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

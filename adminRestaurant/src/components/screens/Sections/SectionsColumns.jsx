@@ -49,6 +49,11 @@ export const columns = [
       const navigate = useNavigate()
       const [isDialogOpen, setIsDialogOpen] = useState(false)
       
+      const handleView = () => {
+        const categoryId = section.categoryId || section.id;
+        navigate(`/sections/merchant/${section.merchantId}/category/${categoryId}`);
+      }
+
       return (
         <>
           <DropdownMenu>
@@ -60,14 +65,13 @@ export const columns = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigator.clipboard.writeText(section.id)}>
-                Copy section ID
+              <DropdownMenuItem onClick={handleView}>
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>Edit section</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(`/sections/merchant/${section.merchantId}/category/${section.categoryId}`)}>
-                <Eye className="mr-2 h-4 w-4" />
-                View section details
+              <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+                Edit
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
