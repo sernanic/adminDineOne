@@ -5,6 +5,7 @@ import { columns } from "./DishesColumns"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Breadcrumbs from "@/components/shared/Breadcrumbs"
 import EditDishDialog from "./EditDishDialog"
+import { DishTableSkeleton } from "./DishTableSkeleton"
 
 export default function Dishes() {
   const { data: dishes, isLoading, error, syncMutation, mutate } = useDataFetching('items', 'dishes')
@@ -34,7 +35,8 @@ export default function Dishes() {
     setSelectedDish(null)
   }
 
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) return <DishTableSkeleton />
+
   if (error) return <div>An error occurred: {error.message}</div>
 
   const breadcrumbItems = [

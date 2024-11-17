@@ -145,7 +145,7 @@ def addItemImage():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@item_bp.route('/item/image/<int:image_id>', methods=['DELETE'])
+@item_bp.route('/item/image/<int:imageId>', methods=['DELETE'])
 @firebaseAuthRequired
 def deleteItemImage(imageId):
     currentUser = request.currentUser

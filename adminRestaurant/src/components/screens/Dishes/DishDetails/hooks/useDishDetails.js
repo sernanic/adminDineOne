@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useToast } from "@/hooks/use-toast"
 import { 
@@ -33,10 +32,10 @@ export function useDishDetails({ currentUser, merchantId, itemId }) {
   })
 
   const addImageMutation = useMutation({
-    mutationFn: (imageFile) => addDishImage({ 
+    mutationFn: (imageURL) => addDishImage({ 
       merchantId, 
       itemId, 
-      imageFile,
+      imageURL,
       currentUser 
     }),
     onSuccess: () => {
@@ -46,10 +45,10 @@ export function useDishDetails({ currentUser, merchantId, itemId }) {
         description: "Image added successfully",
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to add image",
+        description: error.response?.data?.error || "Failed to add image",
         variant: "destructive",
       })
     }
@@ -57,7 +56,7 @@ export function useDishDetails({ currentUser, merchantId, itemId }) {
 
   const deleteImageMutation = useMutation({
     mutationFn: (imageId) => deleteDishImage({ 
-      merchantId, 
+      merchantId,
       itemId,
       imageId, 
       currentUser 
@@ -69,10 +68,10 @@ export function useDishDetails({ currentUser, merchantId, itemId }) {
         description: "Image deleted successfully",
       })
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to delete image",
+        description: error.response?.data?.error || "Failed to delete image",
         variant: "destructive",
       })
     }
@@ -81,8 +80,8 @@ export function useDishDetails({ currentUser, merchantId, itemId }) {
   return {
     dish: dishQuery.data,
     dishImages: imagesQuery.data,
-    isLoading: dishQuery.isLoading || imagesQuery.isLoading,
-    error: dishQuery.error || imagesQuery.error,
+    isLoading: dishQuery.isLoading,
+    error: dishQuery.error,
     imagesError: imagesQuery.error,
     isImagesLoading: imagesQuery.isLoading,
     addImage: addImageMutation.mutate,

@@ -33,6 +33,10 @@ export function DishImages({
   isDeletingImage,
   dish
 }) {
+  const onImageUploaded = (imageURL) => {
+    handleImageUpload(imageURL);
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="flex justify-between items-center px-6 py-4 border-b">
@@ -51,7 +55,7 @@ export function DishImages({
             <DialogHeader>
               <DialogTitle>Upload Image</DialogTitle>
             </DialogHeader>
-            <ImageUploader onUpload={handleImageUpload} />
+            <ImageUploader onImageUploaded={onImageUploaded} bucketName="itemImages"/>
           </DialogContent>
         </Dialog>
       </CardHeader>
@@ -69,7 +73,7 @@ export function DishImages({
             <Carousel className="w-full">
               <CarouselContent>
                 {dishImages.map((image, index) => (
-                  <CarouselItem key={index}>
+                  <CarouselItem key={image.id || index}>
                     <div className="relative aspect-video">
                       <img
                         src={image.imageUrl}
@@ -93,18 +97,6 @@ export function DishImages({
               <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm hover:bg-white/90 border-0" />
               <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-sm hover:bg-white/90 border-0" />
             </Carousel>
-            <div className="absolute inset-y-0 left-0 right-0 pointer-events-none flex items-center justify-between px-4">
-              <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 18l-6-6 6-6" />
-                </svg>
-              </div>
-              <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 18l6-6-6-6" />
-                </svg>
-              </div>
-            </div>
           </div>
         ) : (
           <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg">

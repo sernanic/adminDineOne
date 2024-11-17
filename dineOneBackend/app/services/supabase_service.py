@@ -365,16 +365,16 @@ class SupabaseService:
         return ItemImage.query.filter_by(itemId=itemId, clientId=clientId).all()
 
     @staticmethod
-    def deleteItemImage(itemImageId):
+    def deleteItemImage(itemImageId, clientId):
         """
         Delete an item image from the itemImages table.
 
         :param itemImageId: The ID of the item image to delete
+        :param clientId: The ID of the client who owns the image
         :return: True if the image was successfully deleted, False if the image was not found
-        :raises Exception: If there's an error during the deletion process
         """
         try:
-            itemImage = ItemImage.query.get(itemImageId)
+            itemImage = ItemImage.query.filter_by(id=itemImageId, clientId=clientId).first()
             if itemImage:
                 db.session.delete(itemImage)
                 db.session.commit()
@@ -756,12 +756,3 @@ class SupabaseService:
             isPopular=True,
             deleted=False
         ).all()
-
-
-
-
-
-
-
-
-
