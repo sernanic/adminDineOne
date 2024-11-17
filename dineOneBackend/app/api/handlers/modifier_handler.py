@@ -2,6 +2,7 @@ from flask import jsonify, Blueprint, request
 from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
 from app.utils.auth_middleware import firebaseAuthRequired
+from app.services.itemService import ItemService
 import json
 import logging
 
@@ -21,7 +22,7 @@ def syncModifierGroups(merchantId):
         for modifierData in modifiers:
             SupabaseService.insertOrUpdateModifier(modifierData, merchantId, clientId)
         
-        merchantItems = SupabaseService.getItemsByMerchantId(merchantId,clientId)
+        merchantItems = ItemService.getItemsByMerchantId(merchantId,clientId)
         for item in merchantItems:
             modifier_groups_raw = CloverService.fetchItemModifierGroups(clientId, merchantId, item.itemId)
             modifier_groups = modifier_groups_raw['modifierGroups']['elements']

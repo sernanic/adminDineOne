@@ -7,7 +7,7 @@ import EditFeatureDialog from "./EditFeatureDialog"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import useMerchantStore from "@/stores/merchantStore"
-import { useFeatures } from "./useFeatures"
+import { useFeatures } from "./hooks/useFeatures"
 
 export default function Features() {
   const { currentUser } = useAuth()

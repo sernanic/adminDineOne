@@ -7,7 +7,7 @@ export function useDataFetching(endpoint, queryKey) {
   const queryClient = useQueryClient()
   const selectedMerchantId = useMerchantStore(state => state.selectedMerchantId)
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: [endpoint, selectedMerchantId],
     queryFn: async () => {
       const auth = getAuth()
@@ -30,7 +30,6 @@ export function useDataFetching(endpoint, queryKey) {
     enabled: !!selectedMerchantId,
   })
 
-
   const syncMutation = useMutation({
     mutationFn: async () => {
       const auth = getAuth()
@@ -39,20 +38,34 @@ export function useDataFetching(endpoint, queryKey) {
         throw new Error('User not authenticated')
       }
       const token = await user.getIdToken()
-      return axios.post(`http://127.0.0.1:4000/sync/${endpoint}/${selectedMerchantId}`, {}, {
+      const response = await axios.post(`http://127.0.0.1:4000/sync/${endpoint}/${selectedMerchantId}`, {}, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries([queryKey])
-      console.log(`${queryKey} synced successfully`)
+      // Immediately refetch after successful sync
+      await refetch()
+      return response
     },
     onError: (error) => {
-      console.error(`Error syncing ${queryKey}:`, error)
-    },
+      console.error(`Error syncing ${endpoint}:`, error)
+    }
   })
 
-  return { data, isLoading, error, syncMutation }
+  const handleSync = async () => {
+    try {
+      await syncMutation.mutateAsync()
+    } catch (error) {
+      console.error('Sync failed:', error)
+    }
+  }
+
+  return { 
+    data, 
+    isLoading, 
+    error, 
+    syncMutation,
+    handleSync,
+    isRefetching: syncMutation.isLoading,
+  }
 }

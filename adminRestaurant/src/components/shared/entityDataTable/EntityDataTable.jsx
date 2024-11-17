@@ -110,8 +110,11 @@ export function DataTable({ data, columns, filterColumn, onSync, isSyncing, meta
           <NextUIButton
             className="ml-4"
             onClick={onSync}
-            disabled={isSyncing}
+            isLoading={isSyncing}
             color="primary"
+            spinner={
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            }
           >
             {isSyncing ? 'Syncing...' : 'Sync'}
           </NextUIButton>

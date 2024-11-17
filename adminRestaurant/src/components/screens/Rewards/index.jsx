@@ -9,7 +9,7 @@ import { Plus } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import useMerchantStore from "@/stores/merchantStore"
-import { useRewards } from "./useRewards"
+import { useRewards } from "./hooks/useRewards"
 
 export default function Rewards() {
   const { currentUser } = useAuth()

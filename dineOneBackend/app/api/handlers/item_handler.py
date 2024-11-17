@@ -18,7 +18,7 @@ def syncItems(merchantId):
     try:
         items = CloverService.fetchItems(clientId, merchantId)
         for itemData in items:
-            SupabaseService.insertOrUpdateItem(itemData, merchantId, clientId)
+            ItemService.insertOrUpdateItem(itemData, merchantId, clientId)
 
         return jsonify({"message": "Items synced successfully"}), 200
     except Exception as e:
@@ -30,7 +30,7 @@ def getItems(merchantId):
     currentUser = request.currentUser
     clientId = request.clientId
     try:
-        items = SupabaseService.getItemsByMerchantId(merchantId, clientId)
+        items = ItemService.getItemsByMerchantId(merchantId, clientId)
         itemDTOList = ItemService.convertItemsToDTO(items, merchantId, clientId)
 
         return jsonify({"items": itemDTOList}), 200

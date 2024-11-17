@@ -8,7 +8,7 @@ mobileItemBp = Blueprint('mobileItemBp', __name__)
 @mobileItemBp.route('/api/<clientId>/items/<merchantId>', methods=['GET'])
 def getItems(merchantId, clientId):
     try:
-        items = SupabaseService.getItemsByMerchantId(merchantId, clientId)
+        items = ItemService.getItemsByMerchantId(merchantId, clientId)
         itemDTOList = ItemService.convertItemsToDTO(items, merchantId, clientId)
         return jsonify({"items": itemDTOList}), 200
     except Exception as e:
