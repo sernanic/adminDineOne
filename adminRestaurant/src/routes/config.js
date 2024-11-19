@@ -20,6 +20,7 @@ const AdditionDetails = lazy(() => import('@/components/screens/Additions/Additi
 const ModifierDetails = lazy(() => import('@/components/screens/Additions/ModifierDetails'));
 const CustomersScreen = lazy(() => import('@/components/screens/Customers'));
 const CustomerDetailsScreen = lazy(() => import('@/components/screens/Customers/CustomerDetails'));
+const AppConfigurations = lazy(() => import('@/components/screens/AppConfigurations'));
 
 export const routes = {
   auth: {
@@ -92,6 +93,10 @@ export const routes = {
   settings: {
     path: '/settings',
     component: Settings
+  },
+  configurations: {
+    path: '/configurations',
+    component: AppConfigurations
   },
   customers: {
     list: {
