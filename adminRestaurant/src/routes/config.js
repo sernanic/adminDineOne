@@ -18,6 +18,8 @@ const SectionDetails = lazy(() => import('@/components/screens/Sections/SectionD
 const DishDetails = lazy(() => import('@/components/screens/Dishes/DishDetails'));
 const AdditionDetails = lazy(() => import('@/components/screens/Additions/AdditionsDetails'));
 const ModifierDetails = lazy(() => import('@/components/screens/Additions/ModifierDetails'));
+const CustomersScreen = lazy(() => import('@/components/screens/Customers'));
+const CustomerDetailsScreen = lazy(() => import('@/components/screens/Customers/CustomerDetails'));
 
 export const routes = {
   auth: {
@@ -90,6 +92,16 @@ export const routes = {
   settings: {
     path: '/settings',
     component: Settings
+  },
+  customers: {
+    list: {
+      path: '/customers',
+      component: CustomersScreen
+    },
+    details: {
+      path: '/customers/:customerId',
+      component: CustomerDetailsScreen
+    }
   }
 };
 

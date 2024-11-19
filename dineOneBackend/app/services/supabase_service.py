@@ -699,3 +699,19 @@ class SupabaseService:
             isPopular=True,
             deleted=False
         ).all()
+
+    @staticmethod
+    def getMerchantById(merchantId):
+        """
+        Retrieve a specific merchant by merchantId and clientId from the merchants table.
+        
+        :param merchantId: The ID of the merchant
+        :param clientId: The ID of the client
+        :return: A Merchant object or None if not found
+        """
+        try:
+            merchant = Merchant.query.filter_by(merchantId=merchantId).first()
+            return merchant
+        except Exception as e:
+            print(f"An error occurred while retrieving merchant {merchantId} for clientId {clientId}: {str(e)}")
+            raise

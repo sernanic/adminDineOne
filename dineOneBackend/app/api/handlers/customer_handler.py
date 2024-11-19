@@ -2,10 +2,13 @@ from flask import jsonify, request, Blueprint
 from app import db
 from app.models.customer import Customer
 from datetime import datetime
+from app.services.supabase_service import SupabaseService
+from app.utils.auth_middleware import firebaseAuthRequired
+
 
 customer_bp = Blueprint('customer_bp', __name__)
 
-@customer_bp.route('/api/v1/client/<client_id>/customers', methods=['POST'])
+@customer_bp.route('/customer/', methods=['POST'])
 def create_customer(client_id):
     try:
         data = request.get_json()
@@ -39,11 +42,13 @@ def delete_customer(customer_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 400
 
-@customer_bp.route('/api/v1/client/<client_id>/customers', methods=['GET'])
-def get_all_customers_by_client(client_id):
+@customer_bp.route('/customers/<merchant_id>', methods=['GET'])
+@firebaseAuthRequired
+def get_all_customers_by_merchant(merchant_id):
     try:
-        customers = Customer.query.filter_by(clientId=client_id).all()
-        return jsonify([customer.toDict() for customer in customers]), 200
+        clientId = request.clientId
+        customers = Customer.query.filter_by(clientId=clientId).all()
+        return jsonify({"customers": [customer.toDict() for customer in customers]}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
