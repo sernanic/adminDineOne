@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { Spinner } from "@nextui-org/react";
 import CustomerHeader from "./components/CustomerHeader";
 import CustomerDetails from "./components/CustomerDetails";
@@ -8,13 +8,19 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function CustomerDetailsScreen() {
   const { customerId } = useParams();
+  const location = useLocation();
   const { currentUser } = useAuth();
+  
+  // Use the customer data from navigation state if available
+  const initialCustomer = location.state?.customer;
+  
   const { customer, isLoading, error } = useCustomerDetails({ 
     currentUser,
-    customerId 
+    customerId,
+    initialCustomer // Pass the initial data to the hook
   });
 
-  if (isLoading) {
+  if (isLoading && !initialCustomer) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <Spinner size="lg" />
@@ -30,7 +36,10 @@ export default function CustomerDetailsScreen() {
     );
   }
 
-  if (!customer) {
+  // Use either the fetched customer or the initial customer data
+  const customerData = customer || initialCustomer;
+
+  if (!customerData) {
     return (
       <div className="p-4">
         <p className="text-default-500">Customer not found</p>
@@ -40,8 +49,8 @@ export default function CustomerDetailsScreen() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <CustomerHeader customer={customer} />
-      <CustomerDetails customer={customer} />
+      <CustomerHeader customer={customerData} />
+      <CustomerDetails customer={customerData} />
     </div>
   );
 }

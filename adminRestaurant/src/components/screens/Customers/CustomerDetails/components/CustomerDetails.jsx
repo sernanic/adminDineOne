@@ -35,12 +35,8 @@ export default function CustomerDetails({ customer }) {
               <p className="text-medium">{customer.clientId}</p>
             </div>
             <div>
-              <p className="text-sm text-default-500">Merchant ID</p>
+              <p className="text-sm text-default-500">Preferred Merchant ID</p>
               <p className="text-medium">{customer.merchantId}</p>
-            </div>
-            <div>
-              <p className="text-sm text-default-500">Auth UUID</p>
-              <p className="text-medium">{customer.authUUID}</p>
             </div>
             <div>
               <p className="text-sm text-default-500">Last Updated</p>

@@ -12,14 +12,6 @@ export default function CustomersTable() {
   const { merchantId } = useParams();
   const { currentUser } = useAuth();
   const { data: rawData, isLoading, error, syncMutation } = useDataFetching('customers', 'customers')
-  const [isSyncing, setIsSyncing] = React.useState(false)
-
-  const handleSync = () => {
-    setIsSyncing(true)
-    syncMutation.mutate(null, {
-      onSettled: () => setIsSyncing(false)
-    })
-  }
 
   if (isLoading) return <CustomerTableSkeleton />
 
@@ -46,8 +38,7 @@ export default function CustomersTable() {
             columns={columns} 
             data={customers} 
             filterColumn="email"
-            onSync={handleSync}
-            isSyncing={isSyncing}
+            
           />
         </CardContent>
       </Card>

@@ -67,6 +67,7 @@ export const columns = [
     enableHiding: false,
     cell: ({ row }) => {
       const navigate = useNavigate();
+      const customer = row.original;
       
       return (
         <DropdownMenu>
@@ -79,12 +80,16 @@ export const columns = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigate(`/customers/${row.original.id}`)}
+              onClick={() => navigate(`/customers/${customer.id}`, {
+                state: { customer }
+              })}
             >
               View Details
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigate(`/customers/${row.original.id}/edit`)}
+              onClick={() => navigate(`/customers/${customer.id}/edit`, {
+                state: { customer }
+              })}
             >
               Edit Customer
             </DropdownMenuItem>

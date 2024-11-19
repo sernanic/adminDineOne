@@ -9,8 +9,10 @@ from app.utils.auth_middleware import firebaseAuthRequired
 customer_bp = Blueprint('customer_bp', __name__)
 
 @customer_bp.route('/customer/', methods=['POST'])
-def create_customer(client_id):
+@firebaseAuthRequired
+def create_customer():
     try:
+        client_id = request.clientId
         data = request.get_json()
         customer = Customer(
             authUUID=data['authUUID'],
@@ -30,6 +32,7 @@ def create_customer(client_id):
         return jsonify({'error': str(e)}), 400
 
 @customer_bp.route('/api/v1/customers/<customer_id>', methods=['DELETE'])
+@firebaseAuthRequired
 def delete_customer(customer_id):
     try:
         customer = Customer.query.get(customer_id)
@@ -53,9 +56,11 @@ def get_all_customers_by_merchant(merchant_id):
         return jsonify({'error': str(e)}), 400
 
 @customer_bp.route('/api/v1/customers/<customer_id>', methods=['GET'])
+@firebaseAuthRequired
 def get_customer_by_id(customer_id):
     try:
-        customer = Customer.query.get(customer_id)
+        clientId = request.clientId
+        customer = Customer.query.filter_by(id=customer_id, clientId=clientId).first()
         if not customer:
             return jsonify({'error': 'Customer not found'}), 404
         return jsonify(customer.toDict()), 200
