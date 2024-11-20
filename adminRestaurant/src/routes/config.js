@@ -14,6 +14,7 @@ const Dishes = lazy(() => import('@/components/screens/Dishes/DishTable'));
 const Rewards = lazy(() => import('@/components/screens/Rewards'));
 const Features = lazy(() => import('@/components/screens/Features'));
 const Settings = lazy(() => import('@/components/screens/Settings'));
+const Notifications = lazy(() => import('@/components/screens/Notifications'));
 const SectionDetails = lazy(() => import('@/components/screens/Sections/SectionDetails'));
 const DishDetails = lazy(() => import('@/components/screens/Dishes/DishDetails'));
 const AdditionDetails = lazy(() => import('@/components/screens/Additions/AdditionsDetails'));
@@ -89,6 +90,10 @@ export const routes = {
   features: {
     path: '/features',
     component: Features
+  },
+  notifications: {
+    path: '/notifications',
+    component: Notifications
   },
   settings: {
     path: '/settings',

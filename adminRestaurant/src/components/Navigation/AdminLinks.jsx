@@ -10,7 +10,8 @@ import {
   FaGift, 
   FaStar, 
   FaUsers,
-  FaTools 
+  FaTools,
+  FaBell 
 } from 'react-icons/fa';
 
 const NavLink = ({ to, icon: Icon, children }) => {
@@ -39,6 +40,7 @@ export default function AdminLinks() {
       <NavLink to="/additions" icon={FaPlus}>Additions</NavLink>
       <NavLink to="/sections" icon={FaList}>Sections</NavLink>
       <NavLink to="/features" icon={FaStar}>Features</NavLink>
+      <NavLink to="/notifications" icon={FaBell}>Notifications</NavLink>
       <NavLink to="/rewards" icon={FaGift}>Rewards</NavLink>
       <NavLink to="/customers" icon={FaUsers}>Customers</NavLink>
       <NavLink to="/configurations" icon={FaTools}>App Configurations</NavLink>

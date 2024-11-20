@@ -23,6 +23,9 @@ def create_app():
     # Initialize celery
     celery.conf.update(app.config)
 
+    # Initialize CORS before registering blueprints
+    CORS(app, resources={r"/*": {"origins": "*"}})
+
     db.init_app(app)
 
     initialize_firebase()
@@ -32,8 +35,6 @@ def create_app():
         app.register_blueprint(api_bp)
 
         db.create_all()
-
-    CORS(app, resources={r"/*": {"origins": "*"}})
 
     return app
 
