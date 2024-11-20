@@ -67,7 +67,7 @@ export default function Notifications() {
   ]
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-2">
       <Breadcrumbs items={breadcrumbItems} />
       <Card className="mt-6">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -5,7 +5,7 @@ import { Table } from "@/components/ui/table";
 
 export default function CustomerTableSkeleton() {
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-2">
       <div className="flex items-center space-x-2">
         <Skeleton className="h-5 w-20" />
         <Skeleton className="h-5 w-20" />

@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export function DishTableSkeleton() {
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-2">
       <div className="flex gap-2 mb-6">
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-16" />
