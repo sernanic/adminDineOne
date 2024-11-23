@@ -62,6 +62,20 @@ class CustomerService:
         """
         try:
             from app.models.favorite import Favorite
+            from app.models.item import Item
+            from app.models.customer import Customer
+            
+            # First verify the item exists
+            item = Item.query.filter_by(itemId=itemId).first()
+            if not item:
+                print(f"Item not found: {itemId}")
+                raise ValueError(f"Item not found: {itemId}")
+            
+            # Then verify the customer exists
+            customer = Customer.query.filter_by(authUUID=authUUID).first()
+            if not customer:
+                print(f"Customer not found: {authUUID}")
+                raise ValueError(f"Customer not found: {authUUID}")
             
             # Check if favorite already exists
             existingFavorite = Favorite.query.filter_by(
