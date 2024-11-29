@@ -18,6 +18,7 @@ from app.models.itemModifierGroups import ItemModifierGroup
 from flask import current_app
 from app.dto.modifier_group_dto import ModifierGroupDTO
 from app.dto.modifier_dto import ModifierDTO
+from app.models.address import Address  # Import the Address model
 
 
 class SupabaseService:
@@ -701,7 +702,7 @@ class SupabaseService:
         ).all()
 
     @staticmethod
-    def getMerchantById(merchantId):
+    def getMerchantById(merchantId, clientId):
         """
         Retrieve a specific merchant by merchantId and clientId from the merchants table.
         
@@ -710,8 +711,159 @@ class SupabaseService:
         :return: A Merchant object or None if not found
         """
         try:
-            merchant = Merchant.query.filter_by(merchantId=merchantId).first()
+            merchant = Merchant.query.filter_by(merchantId=merchantId, clientId=clientId).first()
+            if not merchant:
+                raise ValueError("Merchant not found or does not belong to the client")
             return merchant
         except Exception as e:
             print(f"An error occurred while retrieving merchant {merchantId} for clientId {clientId}: {str(e)}")
             raise
+
+    @staticmethod
+    def getMerchantAddress(merchant_id, client_id):
+        """
+        Retrieve the address associated with a merchant.
+        
+        :param merchant_id: The ID of the merchant
+        :param client_id: The ID of the client
+        :return: An Address object or None if not found
+        """
+        print(merchant_id, client_id)
+        try:
+            address = Address.query.filter_by(merchantId=merchant_id, clientId=client_id).first()
+            return address
+        except Exception as e:
+            print(f"An error occurred while retrieving address for merchant {merchant_id}: {str(e)}")
+            raise
+
+    @staticmethod
+    def addAddress(address_data, merchant_id, client_id):
+        address = Address(
+            address=address_data['address'],
+            city=address_data['city'],
+            state=address_data['state'],
+            country=address_data['country'],
+            postal_code=address_data['postalCode'],
+            latitude=address_data['coordinates']['latitude'],
+            longitude=address_data['coordinates']['longitude'],
+            merchant_id=merchant_id,
+            client_id=client_id
+        )
+        db.session.add(address)
+        db.session.commit()
+        return address
+
+    @staticmethod
+    def addMerchantWithAddress(merchant_data, address, client_id):
+        merchant = Merchant(
+            merchantId=merchant_data['merchantId'],
+            name=merchant_data['name'],
+            address=address.address,
+            city=address.city,
+            state=address.state,
+            clientId=client_id
+        )
+        db.session.add(merchant)
+        db.session.commit()
+        return merchant
+
+    @staticmethod
+    def updateAddress(address_id, address_data, client_id):
+        try:
+            address = Address.query.filter_by(id=address_id, clientId=client_id).first()
+            if not address:
+                raise ValueError("Address not found or does not belong to the client")
+            
+            address.address = address_data.get('address', address.address)
+            address.city = address_data.get('city', address.city)
+            address.state = address_data.get('state', address.state)
+            address.country = address_data.get('country', address.country)
+            address.postal_code = address_data.get('postalCode', address.postal_code)
+            
+            if 'coordinates' in address_data:
+                address.latitude = address_data['coordinates'].get('latitude', address.latitude)
+                address.longitude = address_data['coordinates'].get('longitude', address.longitude)
+            
+            db.session.commit()
+            return address
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    @staticmethod
+    def deleteAddress(address_id, client_id):
+        try:
+            address = Address.query.filter_by(id=address_id, clientId=client_id).first()
+            if not address:
+                raise ValueError("Address not found or does not belong to the client")
+            
+            db.session.delete(address)
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    @staticmethod
+    def getAddress(address_id, client_id):
+        try:
+            address = Address.query.filter_by(id=address_id, clientId=client_id).first()
+            if not address:
+                raise ValueError("Address not found or does not belong to the client")
+            return address
+        except Exception as e:
+            raise e
+
+    @staticmethod
+    def updateMerchantAndAddress(merchant_id, data, client_id):
+        try:
+            merchant = Merchant.query.filter_by(merchantId=merchant_id, clientId=client_id).first()
+            if not merchant:
+                raise ValueError("Merchant not found or does not belong to the client")
+            
+            # Find associated address
+            address = Address.query.filter_by(merchantId=merchant_id, clientId=client_id).first()
+            if not address:
+                raise ValueError("Associated address not found")
+
+            # Update merchant data
+            merchant.name = data.get('name', merchant.name)
+            
+            # Update address data if location is provided
+            if 'location' in data:
+                location_data = data['location']
+                address.address = location_data.get('address', address.address)
+                address.city = location_data.get('city', address.city)
+                address.state = location_data.get('state', address.state)
+                address.country = location_data.get('country', address.country)
+                address.postal_code = location_data.get('postalCode', address.postal_code)
+                
+                if 'coordinates' in location_data:
+                    address.latitude = location_data['coordinates'].get('latitude', address.latitude)
+                    address.longitude = location_data['coordinates'].get('longitude', address.longitude)
+            
+            db.session.commit()
+            return merchant, address
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    @staticmethod
+    def deleteMerchantAndAddress(merchant_id, client_id):
+        try:
+            merchant = Merchant.query.filter_by(merchantId=merchant_id, clientId=client_id).first()
+            if not merchant:
+                raise ValueError("Merchant not found or does not belong to the client")
+            
+            # Find and delete associated address
+            address = Address.query.filter_by(merchantId=merchant_id, clientId=client_id).first()
+            if address:
+                db.session.delete(address)
+            
+            # Delete merchant
+            db.session.delete(merchant)
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            raise e

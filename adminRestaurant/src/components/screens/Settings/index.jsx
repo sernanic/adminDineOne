@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import GeneralSettings from './GeneralSettings';
 import UsersSettings from './UsersSettings';
-import RestaurantsSettings from './RestaurantsSettings';
+import RestaurantsSettings from './restaurantSettings/index';
 import IntegrationsSettings from './IntegrationsSettings';
 import { Tabs, Tab } from "@nextui-org/react";
 

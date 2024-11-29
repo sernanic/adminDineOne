@@ -8,17 +8,24 @@
             "name": "Python: Flask",
             "type": "python",
             "request": "launch",
-            "module": "flask",
+            "program": "${workspaceFolder}/run.py",
+            "python": "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
             "env": {
-                "FLASK_APP": "run.py",
-                "FLASK_ENV": "development"
+                "FLASK_APP": "${workspaceFolder}/run.py",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1",
+                "PYTHONPATH": "${workspaceFolder}:/Users/nicolasserna/Library/Python/3.9/lib/python/site-packages",
+                "VIRTUAL_ENV": "${workspaceFolder}/venv"
             },
             "args": [
                 "run",
-                "--no-debugger"
+                "--no-debugger",
+                "--no-reload"
             ],
             "jinja": true,
-            "justMyCode": true
+            "justMyCode": false,
+            "console": "integratedTerminal",
+            "purpose": ["debug-in-terminal"]
         }
     ]
 }
