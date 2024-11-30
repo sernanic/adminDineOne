@@ -81,3 +81,27 @@ def getFavoriteItems(merchantId, clientId):
     except Exception as e:
         logging.error(f"Error in getFavoriteItems - clientId: {clientId}, authUUID: {authUUID}, error: {str(e)}")
         return jsonify({"error": "Failed to fetch favorite items"}), 500
+
+@mobileCustomerBp.route('/api/v1/client/<clientId>/merchant/<merchantId>/customers/merchant', methods=['PUT'])
+@supabaseAuthRequired
+def updateCustomerMerchantId(merchantId, clientId):
+    authUUID = None
+    try:
+        authUUID = request.authUUID
+        logging.info(f"Updating customer merchantId - authUUID: {authUUID}, merchantId: {merchantId}")
+        
+        if not authUUID:
+            return jsonify({"error": "authUUID is required"}), 400
+            
+        customer = CustomerService.updateCustomerMerchantId(authUUID, merchantId)
+        
+        if not customer:
+            logging.warning(f"Customer not found - authUUID: {authUUID}")
+            return jsonify({"error": "Customer not found"}), 404
+            
+        customerDTO = CustomerService.convertCustomerToDTO(customer)
+        logging.info(f"Successfully updated customer merchantId - authUUID: {authUUID}, merchantId: {merchantId}")
+        return jsonify({"customer": customerDTO.toDict()}), 200
+    except Exception as e:
+        logging.error(f"Error in updateCustomerMerchantId - clientId: {clientId}, authUUID: {authUUID}, error: {str(e)}")
+        return jsonify({"error": "Failed to update customer merchant ID"}), 500

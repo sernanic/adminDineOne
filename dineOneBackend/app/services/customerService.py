@@ -150,3 +150,31 @@ class CustomerService:
         except Exception as e:
             print(f"An error occurred while converting customer to DTO: {str(e)}")
             raise
+
+    @staticmethod
+    def updateCustomerMerchantId(authUUID, merchantId):
+        """
+        Update a customer's merchantId.
+
+        :param authUUID: The authentication UUID of the customer
+        :param merchantId: The new merchant ID to set
+        :return: Updated Customer object or None if not found
+        """
+        try:
+            print(f"Attempting to update customer with authUUID: {authUUID} to merchantId: {merchantId}")
+            customer = CustomerService.getCustomerByAuthUUID(authUUID)
+            print(f"Customer found: {customer}")
+            if not customer:
+                print("No customer found with the provided authUUID")
+                return None
+                
+            customer.merchantId = merchantId
+            customer.updatedAt = datetime.now()
+            db.session.commit()
+            print(f"Successfully updated customer {customer.id} with new merchantId: {merchantId}")
+            
+            return customer
+        except Exception as e:
+            print(f"An error occurred while updating customer merchant ID: {str(e)}")
+            db.session.rollback()
+            raise

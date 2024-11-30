@@ -19,6 +19,7 @@ from flask import current_app
 from app.dto.modifier_group_dto import ModifierGroupDTO
 from app.dto.modifier_dto import ModifierDTO
 from app.models.address import Address  # Import the Address model
+from app.models.lineItem import LineItem  # Import the LineItem model
 
 
 class SupabaseService:
@@ -856,6 +857,9 @@ class SupabaseService:
             merchant = Merchant.query.filter_by(merchantId=merchant_id, clientId=client_id).first()
             if not merchant:
                 raise ValueError("Merchant not found or does not belong to the client")
+            
+            # Delete all line items associated with this merchant
+            LineItem.query.filter_by(merchantId=merchant_id).delete()
             
             # Find and delete associated address
             address = Address.query.filter_by(merchantId=merchant_id, clientId=client_id).first()
