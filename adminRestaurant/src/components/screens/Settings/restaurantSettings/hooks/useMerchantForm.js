@@ -88,6 +88,7 @@ export const useMerchantForm = (onSuccess) => {
       const merchantData = {
         merchantId: data.merchantId,
         name: data.name,
+        imageUrl: data.imageUrl,
         location: {
           address: data.address,
           city: data.city,

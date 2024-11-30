@@ -23,7 +23,8 @@ def getMerchants():
             merchant_data = {
                 'merchantId': merchant.merchantId,
                 'name': merchant.name,
-                'location': address.get_location() if address else None
+                'location': address.get_location() if address else None,
+                'imageUrl': merchant.imageUrl
             }
             merchantsData.append(merchant_data)
 
@@ -48,7 +49,8 @@ def getMerchantById(merchantId):
         merchantData = {
             'merchantId': merchant.merchantId,
             'name': merchant.name,
-            'location': address.get_location() if address else None
+            'location': address.get_location() if address else None,
+            'imageUrl': merchant.imageUrl
         }
 
         return jsonify({"merchant": merchantData}), 200
@@ -87,7 +89,8 @@ def addMerchant():
             'merchant': {
                 'merchantId': merchant.merchantId,
                 'name': merchant.name,
-                'location': address.get_location()
+                'location': address.get_location(),
+                'imageUrl': merchant.imageUrl
             }
         }
         
@@ -178,7 +181,8 @@ def updateMerchant(merchant_id):
             'merchant': {
                 'merchantId': merchant.merchantId,
                 'name': merchant.name,
-                'location': address.get_location()
+                'location': address.get_location(),
+                'imageUrl': merchant.imageUrl
             }
         }
         

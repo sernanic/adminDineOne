@@ -761,7 +761,8 @@ class SupabaseService:
             address=address.address,
             city=address.city,
             state=address.state,
-            clientId=client_id
+            clientId=client_id,
+            imageUrl=merchant_data.get('imageUrl')
         )
         db.session.add(merchant)
         db.session.commit()
@@ -828,6 +829,7 @@ class SupabaseService:
 
             # Update merchant data
             merchant.name = data.get('name', merchant.name)
+            merchant.imageUrl = data.get('imageUrl', merchant.imageUrl)
             
             # Update address data if location is provided
             if 'location' in data:

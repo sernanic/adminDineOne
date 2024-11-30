@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import {
@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import ImageUploader from '@/components/shared/imageUploader';
 
 const MerchantForm = ({ onSubmit, initialData, selectedLocation, onAddressSelect }) => {
+  const [imageUrl, setImageUrl] = useState('/placeholder.svg?height=100&width=100');
   const form = useForm({
     defaultValues: {
       merchantId: '',
@@ -24,6 +26,7 @@ const MerchantForm = ({ onSubmit, initialData, selectedLocation, onAddressSelect
       postalCode: '',
       latitude: '',
       longitude: '',
+      imageUrl: '',
     },
   });
 
@@ -39,13 +42,36 @@ const MerchantForm = ({ onSubmit, initialData, selectedLocation, onAddressSelect
         postalCode: initialData.location?.postalCode || '',
         latitude: initialData.location?.coordinates?.latitude?.toString() || '',
         longitude: initialData.location?.coordinates?.longitude?.toString() || '',
+        imageUrl: initialData.imageUrl || '',
       });
+      if (initialData.imageUrl) {
+        setImageUrl(initialData.imageUrl);
+      }
     }
   }, [initialData, form]);
+
+  const handleImageUpload = (uploadedImageUrl) => {
+    setImageUrl(uploadedImageUrl);
+    form.setValue('imageUrl', uploadedImageUrl);
+  };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="flex items-center space-x-4 mb-4">
+          {imageUrl && imageUrl !== '/placeholder.svg?height=100&width=100' ? (
+            <img 
+              src={imageUrl} 
+              alt="Merchant image" 
+              className="h-24 w-32 object-cover rounded-lg shadow-md"
+            />
+          ) : (
+            <div className="h-24 w-32 rounded-lg shadow-md bg-gray-100 flex items-center justify-center text-gray-500 text-xl font-semibold">
+              MC
+            </div>
+          )}
+          <ImageUploader onImageUploaded={handleImageUpload} bucketName="merchantImages" />
+        </div>
         <FormField
           control={form.control}
           name="merchantId"

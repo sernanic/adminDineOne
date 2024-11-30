@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ImageUploader from '../imageUploader';
 
 export default function ProfileDrawer({ isOpen, setIsOpen }) {
@@ -34,7 +33,6 @@ export default function ProfileDrawer({ isOpen, setIsOpen }) {
 
   const fetchUserData = async () => {
     try {
-        console.log("hello")
       const currentUser = getCurrentUser();
       if (!currentUser) {
         throw new Error('No authenticated user found');
@@ -160,15 +158,13 @@ export default function ProfileDrawer({ isOpen, setIsOpen }) {
           <CardContent className="p-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="flex flex-col items-center space-y-4">
-                <Avatar className="w-32 h-32">
-                  <AvatarImage src={avatarUrl} alt="Profile picture" />
-                  <AvatarFallback>
-                    {firstName.charAt(0)}
-                    {lastName.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <ImageUploader onImageUploaded={handleImageUpload} bucketName="employeeAvatars" />
+                <div className="flex items-center space-x-4">
+                  <img 
+                    src={avatarUrl} 
+                    alt="Profile picture" 
+                    className="h-24 w-24 object-cover rounded-lg shadow-md"
+                  />
+                  <ImageUploader onImageUploaded={handleImageUpload} bucketName="avatars" />
                 </div>
               </div>
               <div className="space-y-4">

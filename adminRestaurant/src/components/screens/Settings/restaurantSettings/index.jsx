@@ -99,6 +99,25 @@ const RestaurantsSettings = () => {
   const columns = useMemo(
     () => [
       {
+        header: 'Image',
+        accessorKey: 'imageUrl',
+        cell: ({ row }) => (
+          <div className="h-10 w-14 relative">
+            {row.original.imageUrl ? (
+              <img 
+                src={row.original.imageUrl} 
+                alt={`${row.original.name} image`}
+                className="h-full w-full object-cover rounded-md"
+              />
+            ) : (
+              <div className="h-full w-full rounded-md bg-gray-100 flex items-center justify-center text-gray-500 text-sm font-semibold">
+                MC
+              </div>
+            )}
+          </div>
+        ),
+      },
+      {
         header: 'Merchant ID',
         accessorKey: 'merchantId',
       },

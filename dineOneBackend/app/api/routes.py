@@ -20,9 +20,7 @@ from app.api.handlers.reward_handler import reward_bp
 from app.api.handlers.feature_handler import feature_bp
 from app.api.handlers.mobileAPI.mobile_features_handler import mobile_feature_bp
 from app.api.handlers.notification_handler import notification_bp
-
-
-
+from app.api.handlers.mobileAPI.mobile_merchant_handler import mobileMerchantBp
 
 api_bp = Blueprint('api_bp', __name__)
 
@@ -47,3 +45,4 @@ api_bp.register_blueprint(reward_bp)
 api_bp.register_blueprint(feature_bp)
 api_bp.register_blueprint(mobile_feature_bp)
 api_bp.register_blueprint(notification_bp)
+api_bp.register_blueprint(mobileMerchantBp)
