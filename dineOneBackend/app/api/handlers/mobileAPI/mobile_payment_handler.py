@@ -27,7 +27,7 @@ def processPayment(clientId):
         paymentData = request.json
         paymentToken = paymentData.get('paymentToken')
         products = paymentData.get('products')
-        print("products", products)
+        
         
         if not paymentToken:
             raise ValueError("Payment token is required")
@@ -37,7 +37,7 @@ def processPayment(clientId):
         
         # Create order payload
         orderPayload = paymentService.createOrderPayload(lineItems, totalAmount)
-        
+        print(orderPayload)
         # Get merchantId from your configuration or database
         merchantId = "6JDE8MZSA6FJ1"  # Replace with actual merchant ID retrieval
         

@@ -34,7 +34,7 @@ export default function PrivateRoute({ children }) {
         <div>
           <div className="p-6">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Mate
+              
             </h1>
           </div>
           <AdminLinks />

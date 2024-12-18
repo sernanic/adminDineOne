@@ -10,9 +10,10 @@ class Favorite(db.Model):
     customerAuthUUID = db.Column(TEXT, db.ForeignKey('customers.authUUID'), nullable=False)
     createdAt = db.Column(TIMESTAMP(timezone=True), nullable=False, default=datetime.utcnow)
     clientId = db.Column(BIGINT, nullable=False)
+
     # Relationships
-    item = db.relationship('Item', backref=db.backref('favorites', lazy=True))
-    customer = db.relationship('Customer', backref=db.backref('favorites', lazy=True))
+    item = db.relationship('Item', back_populates='favoriteCustomers')
+    customer = db.relationship('Customer', back_populates='favorites')
 
     def __init__(self, itemId, customerAuthUUID, clientId):
         self.itemId = itemId

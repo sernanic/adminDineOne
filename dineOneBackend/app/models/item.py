@@ -27,8 +27,7 @@ class Item(db.Model):
 
     categories = db.relationship('Category', secondary='categoryItems', back_populates='items')
     modifierGroups = db.relationship('ItemModifierGroup', back_populates='item')
-    favoriteCustomers = db.relationship('Customer', secondary='favorites', 
-                                      backref=db.backref('favoriteItems', lazy='dynamic'))
+    favoriteCustomers = db.relationship('Favorite', back_populates='item', overlaps="customer,favorites")
     
 
     def __init__(self, itemId, merchant_id, hidden, available, auto_manage, name, price, price_type, 

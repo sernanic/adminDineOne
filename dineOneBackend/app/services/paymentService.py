@@ -9,6 +9,28 @@ class PaymentService:
         self.cloverService = CloverService()
 
     def formatLineItem(self, item):
+        # Initialize the modifications list
+        modifications = []
+        
+        # Check if there are selected modifiers and format them
+        if 'selectedModifiers' in item and item['selectedModifiers']:
+            for modifierGroupId, modifiersDict in item['selectedModifiers'].items():
+                for modifierId, modifier in modifiersDict.items():
+                    modifications.append({
+                        "modifier": {
+                            "available": str(modifier['available']).lower(),  # Convert to string and lowercase
+                            "price": modifier['price'],
+                            "modifierGroup": {
+                                "id": modifierGroupId  # Use the modifier group ID
+                            },
+                            "name": modifier['name'],
+                            "id": modifierId
+                        },
+                        "id": modifierId, 
+                        "name": modifier['name'],  
+                        "amount": modifier['price'] 
+                    })
+
         return {
             "printed": "false",
             "exchanged": "false",
@@ -22,7 +44,7 @@ class PaymentService:
             "price": item["price"],
             "unitQty": item["quantity"],
             "note": "",
-            "modifications": [],
+            "modifications": modifications,  # Add the formatted modifiers here
             "discounts": [],
             "refund": {
                 "transactionInfo": {

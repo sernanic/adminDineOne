@@ -15,6 +15,9 @@ class Customer(db.Model):
     merchantId = db.Column(TEXT, nullable=False)
     email = db.Column(TEXT, nullable=False)
 
+    # Define the relationship to Favorite
+    favorites = db.relationship('Favorite', back_populates='customer')
+
     def __init__(self, authUUID, updatedAt, username, firstName, lastName, clientId, merchantId, email):
         self.authUUID = authUUID
         self.updatedAt = updatedAt
