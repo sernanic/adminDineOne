@@ -96,14 +96,35 @@ class ItemService:
         
     @staticmethod
     def convertItemsToDTO(items, merchantId, clientId):
-        """Helper function to convert items to DTO list"""
+        """Helper function to convert items to DTO list efficiently"""
+        if not items:
+            return []
+            
+        # Get all item IDs
+        item_ids = [item.itemId for item in items]
+        
+        # Bulk fetch all images for these items in a single query
+        all_images = ItemImage.query.filter(
+            ItemImage.itemId.in_(item_ids),
+            ItemImage.clientId == clientId
+        ).all()
+        
+        # Create a mapping of itemId to its images
+        item_images_map = {}
+        for image in all_images:
+            if image.itemId not in item_images_map:
+                item_images_map[image.itemId] = []
+            item_images_map[image.itemId].append(image)
+            
+        # Convert items to DTOs using the pre-fetched images
         itemDTOList = []
         for item in items:
-            itemDTO = ItemService.getItemDTOByItemId(item.itemId, merchantId, clientId)
+            images = item_images_map.get(item.itemId, [])
+            itemDTO = ItemDTO(item, images)
             if itemDTO:
                 itemDTOList.append(itemDTO.toDict())
+                
         return itemDTOList
-    
 
     @staticmethod
     def updateItemImagesSortOrder(imageUpdates):
