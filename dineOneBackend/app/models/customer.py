@@ -27,6 +27,7 @@ class Customer(db.Model):
         self.clientId = clientId
         self.merchantId = merchantId
         self.email = email
+
     def __repr__(self):
         return f"<Customer {self.username}>"
 
@@ -41,7 +42,5 @@ class Customer(db.Model):
             'clientId': self.clientId,
             'merchantId': self.merchantId,
             'email': self.email,
-            'favoriteItems': [item.itemId for item in self.favoriteItems.all()] if self.favoriteItems else [],
-            'email': self.email
+            'favoriteItems': [favorite.itemId for favorite in self.favorites] if self.favorites else [],
         }
-
