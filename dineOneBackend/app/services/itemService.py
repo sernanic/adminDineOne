@@ -4,6 +4,8 @@ from app.services.supabase_service import SupabaseService
 from app.dto.item_dto import ItemDTO
 from app.models.itemImages import ItemImage
 from app.models.item import Item
+from app.models.itemModifierGroups import ItemModifierGroup
+from app.models.favorite import Favorite
 from app import db
 
 class ItemService:
@@ -123,3 +125,66 @@ class ItemService:
             db.session.rollback()
             print(f"Error updating image sort orders: {str(e)}")
             raise
+
+    @staticmethod
+    def deleteItems(itemIds: list, merchant_id: str = None, clientId: int = None) -> None:
+        """
+        Delete items and their associated records (images, modifier groups, and favorites).
+        
+        :param itemIds: List of item IDs to delete
+        :param merchant_id: Optional merchant ID filter
+        :param clientId: Optional client ID filter
+        """
+        try:
+            # First delete associated item images
+            ItemImage.query.filter(
+                ItemImage.itemId.in_(itemIds)
+            ).delete(synchronize_session=False)
+            
+            # Delete associated item modifier groups
+            ItemModifierGroup.query.filter(
+                ItemModifierGroup.itemId.in_(itemIds)
+            ).delete(synchronize_session=False)
+            
+            # Delete associated favorites
+            Favorite.query.filter(
+                Favorite.itemId.in_(itemIds)
+            ).delete(synchronize_session=False)
+            
+            # Build the base query for items
+            query = Item.query.filter(Item.itemId.in_(itemIds))
+            
+            # Add optional filters if provided
+            if merchant_id is not None:
+                query = query.filter(Item.merchant_id == merchant_id)
+            if clientId is not None:
+                query = query.filter(Item.clientId == clientId)
+            
+            # Delete the items
+            query.delete(synchronize_session=False)
+            
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def deleteNonExistentItems(merchant_id: str, clientId: int, itemIds: list) -> None:
+        """
+        Delete items that exist in our database but not in Clover anymore.
+        First deletes associated records from itemImages to handle foreign key constraints.
+        
+        :param merchant_id: The merchant ID
+        :param clientId: The client ID
+        :param itemIds: List of item IDs that exist in Clover
+        """
+        # Get all existing items for this merchant
+        existing_items = Item.query.filter_by(merchant_id=merchant_id, clientId=clientId).all()
+        existing_item_ids = {item.itemId for item in existing_items}
+        
+        # Find items to delete (exist in our DB but not in incoming data)
+        items_to_delete = existing_item_ids - set(itemIds)
+        
+        # Delete items that no longer exist in Clover
+        if items_to_delete:
+            ItemService.deleteItems(list(items_to_delete), merchant_id, clientId)

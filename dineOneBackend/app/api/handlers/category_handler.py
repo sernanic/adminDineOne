@@ -15,14 +15,21 @@ def syncCategories(merchantId):
         currentUser = request.currentUser
         clientId = request.clientId
         categories = CloverService.fetchCategories(clientId, merchantId)
+        
+        # Collect all category IDs from Clover
+        clover_category_ids = []
+        
         for categoryData in categories:
             CategoryService.insertOrUpdateCategory(categoryData, merchantId, clientId)
             categoryId = categoryData.get('id')
+            clover_category_ids.append(categoryId)
             items = CloverService.fetchItemsByCategory(clientId, merchantId, categoryId)
             for item in items:
                 CategoryService.insertOrUpdateCategoryItem(categoryId, item['id'], clientId)
-                        
-
+        
+        # Delete categories that don't exist in Clover anymore
+        CategoryService.deleteNonExistentCategories(merchantId, clientId, clover_category_ids)
+        
         return jsonify({"message": "Categories and items synced successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

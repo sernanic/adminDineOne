@@ -56,6 +56,8 @@ class CategoryService:
         if not category_id:
             raise ValueError("Category ID is required")
             
+        
+            
         category = Category.query.filter_by(categoryId=category_id, merchantId=merchantId, clientId=clientId).first()
         
         if category:
@@ -233,3 +235,61 @@ class CategoryService:
             print(f"An error occurred while deleting category image: {str(e)}")
             db.session.rollback()
             raise
+
+    @staticmethod
+    def deleteCategories(categoryIds: list, merchantId: str = None, clientId: int = None) -> None:
+        """
+        Delete categories and their associated records (items and images).
+        
+        :param categoryIds: List of category IDs to delete
+        :param merchantId: Optional merchant ID filter
+        :param clientId: Optional client ID filter
+        """
+        try:
+            # First delete associated category items
+            CategoryItem.query.filter(
+                CategoryItem.categoryId.in_(categoryIds)
+            ).delete(synchronize_session=False)
+            
+            # Delete associated category images
+            CategoryImage.query.filter(
+                CategoryImage.categoryId.in_(categoryIds)
+            ).delete(synchronize_session=False)
+            
+            # Build the base query for categories
+            query = Category.query.filter(Category.categoryId.in_(categoryIds))
+            
+            # Add optional filters if provided
+            if merchantId is not None:
+                query = query.filter(Category.merchantId == merchantId)
+            if clientId is not None:
+                query = query.filter(Category.clientId == clientId)
+            
+            # Delete the categories
+            query.delete(synchronize_session=False)
+            
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def deleteNonExistentCategories(merchantId: str, clientId: int, categoryIds: list) -> None:
+        """
+        Delete categories that exist in our database but not in Clover anymore.
+        First deletes associated records from categoryItems and categoryImages to handle foreign key constraints.
+        
+        :param merchantId: The merchant ID
+        :param clientId: The client ID
+        :param categoryIds: List of category IDs that exist in Clover
+        """
+        # Get all existing categories for this merchant
+        existing_categories = Category.query.filter_by(merchantId=merchantId, clientId=clientId).all()
+        existing_category_ids = {cat.categoryId for cat in existing_categories}
+        
+        # Find categories to delete (exist in our DB but not in incoming data)
+        categories_to_delete = existing_category_ids - set(categoryIds)
+        
+        # Delete categories that no longer exist in Clover
+        if categories_to_delete:
+            CategoryService.deleteCategories(list(categories_to_delete), merchantId, clientId)

@@ -3,6 +3,8 @@ from app.services.clover_service import CloverService
 from app.services.supabase_service import SupabaseService
 from app.utils.auth_middleware import firebaseAuthRequired
 from app.services.itemService import ItemService
+from app.services.modifierService import ModifierService
+from app.services.modifierGroupService import ModifierGroupService
 import json
 import logging
 
@@ -15,19 +17,30 @@ def syncModifierGroups(merchantId):
     clientId = request.clientId
     try:        
         modifierGroups = CloverService.fetchModifierGroups(clientId, merchantId)
+        
+        # Collect all modifier group IDs from Clover
+        clover_group_ids = []
+        
+        # Process all modifier groups
         for modifierGroupData in modifierGroups:
             SupabaseService.insertOrUpdateModifierGroup(modifierGroupData, merchantId, clientId)
+            clover_group_ids.append(modifierGroupData['id'])
         
+        # Delete modifier groups that don't exist in Clover anymore
+        ModifierGroupService.deleteNonExistentModifierGroups(merchantId, clientId, clover_group_ids)
+        
+        # Process modifiers
         modifiers = CloverService.fetchModifiers(clientId, merchantId)
         for modifierData in modifiers:
             SupabaseService.insertOrUpdateModifier(modifierData, merchantId, clientId)
         
-        merchantItems = ItemService.getItemsByMerchantId(merchantId,clientId)
+        # Process item modifier groups
+        merchantItems = ItemService.getItemsByMerchantId(merchantId, clientId)
         for item in merchantItems:
             modifier_groups_raw = CloverService.fetchItemModifierGroups(clientId, merchantId, item.itemId)
             modifier_groups = modifier_groups_raw['modifierGroups']['elements']
             for group in modifier_groups:
-                SupabaseService.insertItemModifierGroup(item.itemId,group['id'],clientId)
+                SupabaseService.insertItemModifierGroup(item.itemId, group['id'], clientId)
 
         return jsonify({"message": "Modifier groups synced successfully"}), 200
     except Exception as e:
@@ -63,10 +76,19 @@ def syncModifiers(merchantId):
         currentUser = request.currentUser
         clientId = request.clientId
         modifiers = CloverService.fetchModifiers(clientId, merchantId)
+        
+        # Collect all modifier IDs from Clover
+        clover_modifier_ids = []
+        
+        # Process all modifiers
         for modifierData in modifiers:
             SupabaseService.insertOrUpdateModifier(modifierData, merchantId, clientId)
+            clover_modifier_ids.append(modifierData['id'])
+        
+        # Delete modifiers that don't exist in Clover anymore
+        ModifierService.deleteNonExistentModifiers(merchantId, clientId, clover_modifier_ids)
 
-        return jsonify({"message": "Modifier groups synced successfully"}), 200
+        return jsonify({"message": "Modifiers synced successfully"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

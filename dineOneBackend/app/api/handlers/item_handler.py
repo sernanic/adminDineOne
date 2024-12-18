@@ -17,8 +17,17 @@ def syncItems(merchantId):
     clientId = request.clientId
     try:
         items = CloverService.fetchItems(clientId, merchantId)
+        
+        # Collect all item IDs from Clover
+        clover_item_ids = []
+        
+        # Process all items
         for itemData in items:
             ItemService.insertOrUpdateItem(itemData, merchantId, clientId)
+            clover_item_ids.append(itemData['id'])
+        
+        # Delete items that don't exist in Clover anymore
+        ItemService.deleteNonExistentItems(merchantId, clientId, clover_item_ids)
 
         return jsonify({"message": "Items synced successfully"}), 200
     except Exception as e:
